@@ -1,6 +1,9 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { SessionService } from '../../../../core/services/session.service';
+import { Sesion } from '../../../../core/models/sesion.model';
 
 export interface Language {
   id: string;
@@ -14,12 +17,13 @@ export interface Language {
   selector: 'app-user-dropdown',
   standalone: true,
   templateUrl: './user-dropdown.component.html',
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, FormsModule],
 })
 export class UserDropdownComponent implements OnInit {
   isOpen = false;
   subDropdownOpen = false;
   currentLocale = 'en';
+  readonly session = inject(SessionService);
 
   languages: Language[] = [
     {
@@ -49,7 +53,10 @@ export class UserDropdownComponent implements OnInit {
     },
   ];
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(
+    private elementRef: ElementRef,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     const savedDir = localStorage.getItem('dir');
@@ -64,6 +71,37 @@ export class UserDropdownComponent implements OnInit {
 
   get currentLang(): Language {
     return this.languages.find((l) => l.id === this.currentLocale) || this.languages[0];
+  }
+
+  get user(): Sesion['user'] | null {
+    return this.session.sesion?.user ?? null;
+  }
+
+  get initials(): string {
+    const nombre = this.user?.nombre ?? '';
+    return (
+      nombre
+        .split(/\s+/)
+        .map((p) => p[0])
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || '?'
+    );
+  }
+
+  get rolLabel(): string {
+    return this.session.sesion?.roles?.[0]?.nombre ?? 'Sin rol';
+  }
+
+  get dependenciaNombre(): string {
+    return this.session.sesion?.dependencia?.nombre ?? 'Sin dependencia';
+  }
+
+  signOut(): void {
+    this.session.signOut();
+    this.closeDropdown();
+    this.router.navigate(['/signin']);
   }
 
   toggleDropdown(event?: Event): void {

@@ -1,0 +1,164 @@
+<app-dasi-module-header title="Evidencias" description="Documentos y evidencias que sustentan el trabajo institucional." [actionLabel]="headerAction" (action)="registerOpen = true" />
+@if (loading) {
+  <p class="mb-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Cargando datos de la API…</p>
+}
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="flex items-center gap-2">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+      </span>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Total registradas</p>
+    </div>
+    <p class="mt-2 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ total }}</p>
+  </div>
+  @for (kpi of kpis; track kpi.label) {
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center gap-2">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 text-gray-500 dark:bg-gray-800">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </span>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ kpi.label }}</p>
+      </div>
+      <p class="mt-2 text-2xl font-semibold {{ kpi.tint }}">{{ evidencias.filter((e) => e.estado === kpi.estado).length }}</p>
+    </div>
+  }
+</div>
+<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
+<div class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="relative w-full lg:w-72">
+        <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="aplicarBuscador()"
+          class="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 lg:w-72"
+          placeholder="Buscar evidencia o actividad"
+        />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <select [(ngModel)]="taskFilter" (ngModelChange)="aplicarBuscador()" class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+          <option value="todas">Todas las actividades</option>
+          @for (actividad of actividades; track actividad.id) {
+            <option [value]="actividad.id">{{ actividad.proyecto.code }} · {{ actividad.titulo }}</option>
+          }
+        </select>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="aplicarBuscador()" class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+          @for (option of statusOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+        @if (hasFilters()) {
+          <button (click)="clearFilters()" class="inline-flex h-10 items-center gap-1.5 rounded-lg border border-gray-200 px-3 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            Limpiar
+          </button>
+        }
+      </div>
+    </div>
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[820px]">
+      <thead class="border-y border-gray-100 text-left dark:border-gray-800">
+        <tr>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Evidencia</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Actividad</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Responsable</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Fecha</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Tamaño</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Estado</th>
+          <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+        @for (evidence of filtered; track evidence.id) {
+          <tr>
+            <td class="py-4">
+              <div class="flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg {{ fileAccent('Adjunto') }}" [innerHTML]="fileIcon('Adjunto') | safeHtml"></span>
+                <div class="min-w-0">
+                  <p class="truncate font-medium text-gray-800 dark:text-white/90">{{ evidence.nombre }}</p>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">Adjunto · {{ evidence.id }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 text-sm text-gray-500 dark:text-gray-400">
+              <p class="font-mono text-xs font-medium text-brand-500">{{ evidence.proyecto?.code ?? '—' }}</p>
+              <span>{{ evidence.actividad?.titulo ?? '—' }}</span>
+            </td>
+            <td class="py-4 text-sm text-gray-500 dark:text-gray-400">{{ evidence.usuario.nombre }}</td>
+            <td class="py-4 text-sm text-gray-500 dark:text-gray-400">{{ fmt(evidence.created_at) }}</td>
+            <td class="py-4 text-sm text-gray-500 dark:text-gray-400">{{ evidence.archivo?.size_bytes ?? '—' }}</td>
+            <td class="py-4"><app-badge size="sm" [color]="badge(evidence.estado)">{{ estadoLabel(evidence.estado) }}</app-badge></td>
+            <td class="py-4">
+              <div class="flex flex-wrap gap-3">
+                <button (click)="selected = evidence" class="text-xs font-medium text-brand-500 hover:text-brand-600">Ver</button>
+                @if ((evidence.estado === 'Pendiente' || evidence.estado === 'Observada') && canReview) {
+                  <button (click)="review(evidence)" class="text-xs font-medium text-gray-600 hover:text-gray-800 dark:text-gray-400">Revisar</button>
+                }
+                @if ((evidence.estado === 'EnRevision' || evidence.estado === 'Observada') && canApprove) {
+                  <button (click)="approve(evidence)" class="text-xs font-medium text-success-600 dark:text-success-500">Aprobar</button>
+                }
+                @if ((evidence.estado === 'EnRevision' || evidence.estado === 'Observada') && canObserve) {
+                  <button (click)="observe(evidence)" class="text-xs font-medium text-error-600 dark:text-error-500">Observar</button>
+                }
+                @if (canDelete) {
+                  <button (click)="askDelete(evidence)" class="text-xs font-medium text-gray-400 hover:text-error-600 dark:text-gray-500 dark:hover:text-error-500">Eliminar</button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered.length === 0) {
+      <p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">Sin evidencias para los filtros seleccionados.</p>
+    }
+  </div>
+</div>
+
+<app-dasi-detail-modal
+  [isOpen]="selected !== null"
+  [title]="selected?.nombre || 'Evidencia'"
+  [items]="selected ? [{ label: 'Nombre', value: selected.nombre }, { label: 'Tipo', value: 'Adjunto' }, { label: 'Actividad', value: selected.actividad?.titulo ?? '—' }, { label: 'Proyecto', value: selected.proyecto?.code ?? '—' }, { label: 'Responsable', value: selected.usuario.nombre }, { label: 'Fecha', value: fmt(selected.created_at) }, { label: 'Estado', value: estadoLabel(selected.estado) }] : []"
+  (close)="selected = null"
+/>
+
+<app-modal [isOpen]="registerOpen" (close)="registerOpen = false" className="max-w-[520px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">Registrar evidencia</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">La evidencia se registra y se vincula a la actividad seleccionada.</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm text-gray-600 dark:text-gray-400">Actividad</label>
+      <select [(ngModel)]="newTaskId" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        @for (actividad of actividades; track actividad.id) {
+          <option [value]="actividad.id">{{ actividad.proyecto.code }} · {{ actividad.titulo }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm text-gray-600 dark:text-gray-400">Tipo</label>
+      <select [(ngModel)]="evidenceType" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        @for (type of evidenceTypes; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm text-gray-600 dark:text-gray-400">Nombre del documento</label>
+      <input [(ngModel)]="newName" placeholder="Informe de avance.pdf" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" />
+    </div>
+  </div>
+  <div class="mt-7 flex justify-end gap-3">
+    <button (click)="registerOpen = false" class="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button (click)="submitRegister()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">Registrar</button>
+  </div>
+</app-modal>
+
+<app-dasi-confirm-modal
+  [isOpen]="deleteOpen"
+  title="¿Eliminar evidencia?"
+  [message]="pendingDelete ? 'La evidencia “' + pendingDelete.nombre + '” se eliminará de forma permanente.' : ''"
+  confirmLabel="Eliminar"
+  cancelLabel="Cancelar"
+  (close)="deleteOpen = false"
+  (confirm)="confirmDelete()"
+/>

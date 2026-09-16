@@ -10,7 +10,7 @@
   }
   <!-- Modal Content -->
   <div
-    [ngClass]="isFullscreen ? 'w-full h-full' : 'relative w-full rounded-3xl bg-white dark:bg-gray-900'"
+    [ngClass]="isFullscreen ? 'w-full h-full' : 'relative w-full max-h-[92vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900'"
     [class]="className"
     (click)="onContentClick($event)"
   >
@@ -35,7 +35,7 @@
       </svg>
     </button>
     }
-    <div>
+    <div class="overflow-y-auto overscroll-contain">
       <ng-content></ng-content>
     </div>
   </div>

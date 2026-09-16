@@ -90,10 +90,13 @@ Evitar rediseñar componentes existentes innecesariamente.
 
 ### ADMINISTRACIÓN
 
+- Panel de administración
 - Usuarios
 - Roles
 - Permisos
 - Módulos
+- Dependencias
+- Cargos
 - Configuración
 
 ### AUDITORÍA
@@ -123,6 +126,23 @@ La implementación de esta arquitectura queda para fases posteriores.
 - Mantener soporte para dark mode y RTL cuando corresponda.
 - Reutilizar componentes existentes antes de crear nuevos.
 
+## Comandos
+
+- Servidor de desarrollo: `npm start` (http://localhost:4200)
+- Build: `npm run build`
+- Tests (Karma/Chrome): `npm test`
+- No hay script de lint ni typecheck separado; `npm run build` valida tipos y templates.
+
+## Estructura del código DASI
+
+- Páginas: `src/app/pages/dasi/` (dashboard, list-demo, kanban, workflow, insights, admin-demo, audit, evidence, observations, project-detail).
+- Componentes DASI compartidos: `src/app/shared/components/dasi/` (module-header, detail-modal, activity-modal, confirm-modal).
+- Datos ficticios: `src/app/shared/data/dasi-demo-data.service.ts`. El estado demo se persiste en `localStorage` bajo la clave `dasi_demo_state`; `reset()` lo restaura.
+- Rutas: `src/app/app.routes.ts`. Varias rutas reutilizan el mismo componente y cambian su contenido según `data: { kind: '...' }`. La administración usa `AdminDemoComponent` con `kind`: `administracion` (panel), `users`, `roles`, `permissions`, `modules`, `dependencias`, `cargos`, `settings`. Los usuarios se crean desde `/usuarios` con roles, cargos y **una o varias** dependencias (una marcada como principal).
+- Sidebar: la navegación se define como datos en `src/app/shared/layout/app-sidebar/app-sidebar.component.ts`. Al añadir una ruta, reflejarla también ahí (modulo slug en `MODULE_BY_PATH` y subitem del menú).
+- La ruta `/` renderiza el Dashboard DASI (`DasiDashboardComponent`) conectado al Store; el resto de la navegación también es DASI.
+- Seed de datos: `api/prisma/seed.mjs` carga datos institucionales reales (dependencias, cargos, roles, módulos, permisos, usuarios y proyectos demo). Los módulos creados en el seed deben también mapearse en `MODULE_BY_PATH` para que la sesión los muestre en el menú.
+
 ## Git
 
 Git es obligatorio para controlar los cambios.
@@ -131,3 +151,8 @@ Antes de realizar cambios importantes:
 
 ```bash
 git status
+git diff
+git log --oneline -10
+```
+
+Mantener los mensajes de commit en español con conventional commits (estilo ya usado en el log: `feat(dasi): ...`, `docs(dasi): ...`).

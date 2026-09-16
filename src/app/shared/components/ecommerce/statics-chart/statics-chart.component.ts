@@ -46,12 +46,12 @@ export class StatisticsChartComponent implements AfterViewInit {
   }
   public series: ApexAxisChartSeries = [
     {
-      name: 'Sales',
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+      name: 'Planificadas',
+      data: [12, 15, 16, 14, 20, 22, 18, 25, 23, 28, 26, 30],
     },
     {
-      name: 'Revenue',
-      data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+      name: 'Completadas',
+      data: [8, 11, 14, 12, 17, 19, 15, 21, 18, 24, 20, 27],
     },
   ];
 

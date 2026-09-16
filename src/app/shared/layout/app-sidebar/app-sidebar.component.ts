@@ -4,6 +4,7 @@ import { SidebarService } from '../../services/sidebar.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { SafeHtmlPipe } from '../../pipe/safe-html.pipe';
 import { SidebarWidgetComponent } from './app-sidebar-widget.component';
+import { SessionService } from '../../../core/services/session.service';
 import { combineLatest, Subscription } from 'rxjs';
 
 type NavItem = {
@@ -12,6 +13,32 @@ type NavItem = {
   path?: string;
   new?: boolean;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+};
+
+const MODULE_BY_PATH: Record<string, string> = {
+  '/': 'dashboard',
+  '/proyectos': 'proyectos',
+  '/mis-proyectos': 'mis-proyectos',
+  '/proyectos-oficina': 'proyectos-oficina',
+  '/proyectos-colaboracion': 'proyectos-colaboracion',
+  '/tareas': 'tareas',
+  '/kanban': 'kanban',
+  '/workflow': 'workflow',
+  '/actividades': 'actividades',
+  '/observaciones': 'observaciones',
+  '/evidencias': 'evidencias',
+  '/calendar': 'calendar',
+  '/reportes': 'reportes',
+  '/indicadores': 'indicadores',
+  '/usuarios': 'usuarios',
+  '/administracion': 'administracion',
+  '/roles': 'roles',
+  '/permisos': 'permisos',
+  '/modulos': 'modulos',
+  '/dependencias': 'dependencias',
+  '/cargos': 'cargos',
+  '/configuracion': 'configuracion',
+  '/auditoria': 'auditoria',
 };
 
 @Component({
@@ -54,6 +81,8 @@ navItems: NavItem[] = [
     subItems: [
       { name: 'Proyectos', path: '/proyectos' },
       { name: 'Mis proyectos', path: '/mis-proyectos' },
+      { name: 'Proyectos de mi oficina', path: '/proyectos-oficina' },
+      { name: 'Donde colaboro', path: '/proyectos-colaboracion' },
       { name: 'Tareas', path: '/tareas' },
       { name: 'Kanban', path: '/kanban' },
     ],
@@ -78,6 +107,7 @@ navItems: NavItem[] = [
       { name: 'Actividades', path: '/actividades' },
       { name: 'Observaciones', path: '/observaciones' },
       { name: 'Evidencias', path: '/evidencias' },
+      { name: 'Calendario', path: '/calendar' },
     ],
   },
 
@@ -119,10 +149,13 @@ othersItems: NavItem[] = [
       </svg>
     `,
     subItems: [
+      { name: 'Panel', path: '/administracion' },
       { name: 'Usuarios', path: '/usuarios' },
       { name: 'Roles', path: '/roles' },
       { name: 'Permisos', path: '/permisos' },
       { name: 'Módulos', path: '/modulos' },
+      { name: 'Dependencias', path: '/dependencias' },
+      { name: 'Cargos', path: '/cargos' },
       { name: 'Configuración', path: '/configuracion' },
     ],
   },
@@ -149,6 +182,27 @@ othersItems: NavItem[] = [
       { name: 'Registro y trazabilidad', path: '/auditoria' },
     ],
   },
+
+  {
+    name: 'Institucional',
+    icon: `
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M10 10h.01M14 10h.01"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    `,
+    subItems: [
+      { name: 'Mi perfil', path: '/profile' },
+      { name: 'Mi actividad', path: '/calendar' },
+      { name: 'Ayuda', path: '/ayuda' },
+      { name: 'Acerca de DASI', path: '/acerca' },
+    ],
+  },
 ];
 
   openSubmenu: string | null | number = null;
@@ -164,11 +218,36 @@ othersItems: NavItem[] = [
   constructor(
     public sidebarService: SidebarService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private session: SessionService,
   ) {
     this.isExpanded$ = this.sidebarService.isExpanded$;
     this.isMobileOpen$ = this.sidebarService.isMobileOpen$;
     this.isHovered$ = this.sidebarService.isHovered$;
+  }
+
+  get menuVisible(): NavItem[] {
+    return this.filterItems(this.navItems);
+  }
+
+  get othersVisible(): NavItem[] {
+    return this.filterItems(this.othersItems);
+  }
+
+  private filterItems(items: NavItem[]): NavItem[] {
+    return items
+      .map((nav) => {
+        if (!nav.subItems) {
+          const mod = nav.path ? MODULE_BY_PATH[nav.path] : undefined;
+          return mod && !this.session.can(mod, 'Ver') ? null : nav;
+        }
+        const subs = nav.subItems.filter((s) => {
+          const mod = MODULE_BY_PATH[s.path];
+          return !mod || this.session.can(mod, 'Ver');
+        });
+        return subs.length ? { ...nav, subItems: subs } : null;
+      })
+      .filter((n): n is NavItem => n !== null);
   }
 
   ngOnInit() {
@@ -268,7 +347,6 @@ othersItems: NavItem[] = [
   }
 
   onSubmenuClick() {
-    console.log('click submenu');
     this.isMobileOpen$.subscribe(isMobile => {
       if (isMobile) {
         this.sidebarService.setMobileOpen(false);

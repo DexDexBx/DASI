@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DateSelectInfo, EventClickInfo, EventInput } from 'fullcalendar';
@@ -8,11 +9,27 @@ import interactionPlugin from 'fullcalendar/interaction';
 import multiMonthPlugin from 'fullcalendar/multimonth';
 import themePlugin from 'fullcalendar/themes/classic';
 import timeGridPlugin from 'fullcalendar/timegrid';
+import { forkJoin } from 'rxjs';
 import { ModalComponent } from '../../shared/components/ui/modal/modal.component';
+import { DasiModuleHeaderComponent } from '../../shared/components/dasi/module-header/module-header.component';
+import { CalendarioApiService } from '../../core/services/calendario-api.service';
+import { SessionService } from '../../core/services/session.service';
+import { VencimientosService } from '../../core/services/vencimientos.service';
+import { EventoCalendario } from '../../core/models/evento-calendario.model';
+import { Proyecto } from '../../core/models/proyecto.model';
+import { Actividad } from '../../core/models/actividad.model';
 
 export interface CalendarEvent extends EventInput {
   extendedProps: {
     calendar: string;
+    readonly?: boolean;
+    origen?: 'proyecto' | 'actividad';
+    origenId?: string;
+    proyectoId?: string;
+    prioridad?: string;
+    responsable?: string;
+    estado?: string;
+    fechaFin?: string;
   };
 }
 
@@ -23,7 +40,8 @@ export interface CalendarEvent extends EventInput {
     CommonModule,
     FormsModule,
     FullCalendarModule,
-    ModalComponent
+    ModalComponent,
+    DasiModuleHeaderComponent,
   ],
   templateUrl: './calender.component.html',
   styles: ``
@@ -32,12 +50,17 @@ export class CalenderComponent implements OnInit {
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
 
   events: CalendarEvent[] = [];
+  eventos: EventoCalendario[] = [];
   selectedEvent: CalendarEvent | null = null;
+
+  private currentRange: { desde: string; hasta: string } = { desde: '', hasta: '' };
+  proyectoFiltroId = '';
   eventTitle = '';
   eventStartDate = '';
   eventEndDate = '';
   eventLevel = 'Primary';
   isOpen = false;
+  eventReadonly = false;
 
   currentView = 'dayGridMonth';
 
@@ -57,33 +80,22 @@ export class CalenderComponent implements OnInit {
 
   calendarOptions!: CalendarOptions;
 
-  constructor(private elRef: ElementRef) {}
+  constructor(
+    private elRef: ElementRef,
+    private calendarioApi: CalendarioApiService,
+    private vencimientos: VencimientosService,
+    private session: SessionService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
+    this.proyectoFiltroId = this.route.snapshot.queryParamMap.get('proyecto') ?? '';
     const isRtl = document.documentElement.dir === 'rtl';
     const locale = document.documentElement.lang || 'en';
 
-    this.events = [
-      {
-        id: '1',
-        title: 'Event Conf.',
-        start: new Date().toISOString().split('T')[0],
-        extendedProps: { calendar: 'Danger' }
-      },
-      {
-        id: '2',
-        title: 'Meeting',
-        start: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        extendedProps: { calendar: 'Success' }
-      },
-      {
-        id: '3',
-        title: 'Workshop',
-        start: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-        end: new Date(Date.now() + 259200000).toISOString().split('T')[0],
-        extendedProps: { calendar: 'Primary' }
-      }
-    ];
+    this.currentRange = this.monthRangeOf(new Date());
+    this.loadEventos();
 
     this.calendarOptions = {
       plugins: [
@@ -124,7 +136,7 @@ export class CalenderComponent implements OnInit {
             'flex size-10! p-0! items-center justify-center! rounded-lg! border! bg-transparent! border-gray-200! text-gray-700 hover:border-gray-200 hover:bg-gray-50! focus:shadow-none active:border-gray-200! active:bg-transparent! active:shadow-none! dark:border-gray-800! dark:text-gray-400 dark:hover:border-gray-800 dark:hover:bg-gray-900! dark:active:border-gray-800!',
         },
         addEventButton: {
-          text: 'Add Event +',
+          text: 'Nuevo evento +',
           click: () => this.handleOpenAddModal(),
           className:
             'rounded-lg! border-0! bg-brand-500! px-4! py-2.5! text-sm! font-medium! text-white hover:bg-brand-600! focus:shadow-none! w-auto!',
@@ -308,6 +320,13 @@ export class CalenderComponent implements OnInit {
       eventContent: (arg) => this.renderEventContent(arg),
       datesSet: (arg: any) => {
         this.currentView = arg.view.type;
+        const start: Date = arg.view.currentStart ?? new Date();
+        const end: Date = arg.view.currentEnd ?? new Date();
+        this.currentRange = {
+          desde: this.dayKey(start),
+          hasta: this.dayKey(new Date(end.getTime() - 86_400_000)),
+        };
+        this.loadEventos();
         requestAnimationFrame(() => {
           const el = this.elRef.nativeElement;
           const chunk = el.querySelector('.ta-toolbar-section:last-child') as HTMLElement;
@@ -317,6 +336,184 @@ export class CalenderComponent implements OnInit {
         });
       }
     };
+  }
+
+  toISO(value: string): string {
+    if (!value) return new Date().toISOString().split('T')[0];
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime())
+      ? new Date().toISOString().split('T')[0]
+      : parsed.toISOString().split('T')[0];
+  }
+
+  private monthRangeOf(reference: Date): { desde: string; hasta: string } {
+    const start = new Date(reference.getFullYear(), reference.getMonth(), 1);
+    const end = new Date(reference.getFullYear(), reference.getMonth() + 1, 0);
+    return { desde: this.dayKey(start), hasta: this.dayKey(end) };
+  }
+
+  private dayKey(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  private dayMs(value: string): number {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+  }
+
+  private toISOFull(value: string): string {
+    if (!value) return new Date().toISOString();
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+  }
+
+  private loadEventos(): void {
+    const { desde, hasta } = this.currentRange;
+    if (!desde || !hasta) return;
+    const usuarioId = this.session.sesion?.user.id ?? '';
+    forkJoin({
+      eventos: this.calendarioApi.findAll({
+        desde,
+        hasta,
+        usuario_id: usuarioId || undefined,
+        proyecto_id: this.proyectoFiltroId || undefined,
+      }),
+      sistema: this.vencimientos.cargar(usuarioId),
+    }).subscribe({
+      next: ({ eventos, sistema }) => {
+        this.eventos = eventos.data;
+        this.events = this.construirEventos(eventos.data, sistema.proyectos, sistema.actividades, desde, hasta);
+        this.refreshCalendarEvents();
+      },
+      error: () => {
+        this.eventos = [];
+        this.events = [];
+      },
+    });
+  }
+
+  private construirEventos(
+    eventos: EventoCalendario[],
+    proyectos: Proyecto[],
+    actividades: Actividad[],
+    desde: string,
+    hasta: string,
+  ): CalendarEvent[] {
+    const calendario: CalendarEvent[] = eventos.map((evento) => ({
+      id: evento.id,
+      title: evento.titulo ?? evento.proyecto?.nombre ?? evento.actividad?.titulo ?? '',
+      start: evento.todo_dia ? this.toISO(evento.fecha_inicio) : this.toISOFull(evento.fecha_inicio),
+      end: evento.fecha_fin
+        ? evento.todo_dia
+          ? this.toISO(evento.fecha_fin)
+          : this.toISOFull(evento.fecha_fin)
+        : undefined,
+      allDay: evento.todo_dia,
+      extendedProps: { calendar: evento.color ?? 'Primary' },
+    }));
+
+    const conEvento = new Set(eventos.map((e) => e.actividad_id).filter(Boolean) as string[]);
+    const desdeMs = this.dayMs(desde);
+    const hastaMs = this.dayMs(hasta) + 86_400_000 - 1;
+
+    const sinteticos: CalendarEvent[] = [];
+
+    for (const p of proyectos) {
+      if (p.estado === 'Completado' || p.estado === 'Implementado' || p.fecha_fin_real) {
+        continue;
+      }
+      const inicioMs = p.fecha_inicio ? this.dayMs(this.toISO(p.fecha_inicio)) : null;
+      const finMs = p.fecha_fin_estimada ? this.dayMs(this.toISO(p.fecha_fin_estimada)) : null;
+      if (!finMs) {
+        continue;
+      }
+      if (this.proyectoFiltroId && p.id !== this.proyectoFiltroId) {
+        continue;
+      }
+      const visible = (inicioMs === null ? finMs : inicioMs) <= hastaMs && finMs >= desdeMs;
+      if (!visible) {
+        continue;
+      }
+      const finInclusivo = new Date(this.toISO(p.fecha_fin_estimada ?? ''));
+      finInclusivo.setDate(finInclusivo.getDate() + 1);
+      sinteticos.push({
+        id: `proy-${p.id}`,
+        title: `${p.code} · ${p.nombre}`,
+        start: inicioMs !== null ? this.toISO(p.fecha_inicio ?? '') : this.toISO(p.fecha_fin_estimada ?? ''),
+        end: this.dayKey(finInclusivo),
+        allDay: true,
+        extendedProps: {
+          calendar: this.vencimientos.colorPorPrioridad(p.prioridad),
+          readonly: true,
+          origen: 'proyecto',
+          origenId: p.id,
+          proyectoId: p.id,
+          prioridad: p.prioridad,
+          responsable: p.coordinador?.nombre ?? '—',
+          estado: p.estado,
+          fechaFin: p.fecha_fin_estimada ?? '',
+        },
+      });
+    }
+
+    for (const a of actividades) {
+      if (a.estado === 'Completado' || a.estado === 'Terminado' || a.fecha_fin_real) {
+        continue;
+      }
+      if (!a.fecha_fin_estimada) {
+        continue;
+      }
+      if (conEvento.has(a.id)) {
+        continue;
+      }
+      const finMs = this.dayMs(this.toISO(a.fecha_fin_estimada));
+      if (this.proyectoFiltroId && a.proyecto_id !== this.proyectoFiltroId) {
+        continue;
+      }
+      if (finMs < desdeMs || finMs > hastaMs) {
+        continue;
+      }
+      sinteticos.push({
+        id: `act-${a.id}`,
+        title: `${a.code ?? a.proyecto.code} · ${a.titulo}`,
+        start: this.toISO(a.fecha_fin_estimada),
+        end: this.toISO(a.fecha_fin_estimada),
+        allDay: true,
+        extendedProps: {
+          calendar: this.vencimientos.colorPorPrioridad(a.prioridad),
+          readonly: true,
+          origen: 'actividad',
+          origenId: a.id,
+          proyectoId: a.proyecto_id,
+          prioridad: a.prioridad,
+          responsable: a.responsable?.nombre ?? '—',
+          estado: a.estado,
+          fechaFin: a.fecha_fin_estimada ?? '',
+        },
+      });
+    }
+
+    return [...calendario, ...sinteticos];
+  }
+
+  private refreshCalendarEvents(): void {
+    const api = this.calendarComponent?.getApi();
+    if (api) {
+      api.removeAllEvents();
+      this.events.forEach((ev) => api.addEvent(ev));
+    }
+  }
+
+  get proyectoFiltroActivo(): boolean {
+    return this.proyectoFiltroId !== '';
+  }
+
+  limpiarFiltroProyecto(): void {
+    this.proyectoFiltroId = '';
+    this.router.navigate(['/calendar']);
   }
 
   renderViewSelect(containerEl: HTMLElement, activeViewKey: string) {
@@ -452,6 +649,32 @@ export class CalenderComponent implements OnInit {
       return;
     }
 
+    const props = (event.extendedProps ?? {}) as CalendarEvent['extendedProps'];
+    if (props.origen === 'proyecto' || props.origen === 'actividad') {
+      this.selectedEvent = {
+        id: event.id,
+        title: event.title,
+        start: event.startStr,
+        end: event.endStr,
+        extendedProps: {
+          calendar: props.calendar || 'primary',
+          readonly: true,
+          origen: props.origen,
+          origenId: props.origenId,
+          proyectoId: props.proyectoId,
+          prioridad: props.prioridad,
+          responsable: props.responsable,
+          estado: props.estado,
+          fechaFin: props.fechaFin ?? '',
+        },
+      };
+      this.eventStartDate = event.startStr ? event.startStr.split('T')[0] : '';
+      this.eventEndDate = event.endStr ? event.endStr.split('T')[0] : this.eventStartDate;
+      this.eventReadonly = true;
+      this.openModal();
+      return;
+    }
+
     this.selectedEvent = {
       id: event.id,
       title: event.title,
@@ -466,36 +689,80 @@ export class CalenderComponent implements OnInit {
     this.openModal();
   }
 
-  handleAddOrUpdateEvent() {
-    const titleVal = this.eventTitle.trim() || (this.selectedEvent ? 'Event' : 'New Event');
-    if (this.selectedEvent) {
-      this.events = this.events.map(ev =>
-        ev.id === this.selectedEvent!.id
-          ? {
-              ...ev,
-              title: titleVal,
-              start: this.eventStartDate,
-              end: this.eventEndDate || this.eventStartDate,
-              extendedProps: { calendar: this.eventLevel || 'Primary' }
-            }
-          : ev
-      );
-    } else {
-      const newEvent: CalendarEvent = {
-        id: Date.now().toString(),
-        title: titleVal,
-        start: this.eventStartDate,
-        end: this.eventEndDate || this.eventStartDate,
-        allDay: true,
-        extendedProps: { calendar: this.eventLevel || 'Primary' }
-      };
-      this.events = [...this.events, newEvent];
+  verProyectoEnCalendario(): void {
+    const proyectoId = this.selectedEvent?.extendedProps?.proyectoId;
+    if (!proyectoId) {
+      return;
     }
+    this.closeModal();
+    this.router.navigate(['/proyectos', proyectoId]);
+  }
 
-    const api = this.calendarComponent?.getApi();
-    if (api) {
-      api.removeAllEvents();
-      this.events.forEach(ev => api.addEvent(ev));
+  get modalOrigenLabel(): string {
+    return this.selectedEvent?.extendedProps?.origen === 'actividad' ? 'Actividad' : 'Proyecto';
+  }
+
+  prioridadBadgeClass(prioridad: string | undefined): string {
+    switch (prioridad) {
+      case 'Alta':
+        return 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-400';
+      case 'Media':
+        return 'bg-orange-50 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400';
+      case 'Baja':
+        return 'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-400';
+      default:
+        return 'bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-300';
+    }
+  }
+
+  get diasRestantesLabel(): string {
+    const base = this.selectedEvent?.extendedProps?.fechaFin || this.eventStartDate;
+    if (!base) {
+      return '—';
+    }
+    const fecha = new Date(`${base}T00:00:00`);
+    if (Number.isNaN(fecha.getTime())) {
+      return '—';
+    }
+    const dias = this.vencimientos.diasRelativos(fecha.getTime());
+    if (dias < 0) {
+      return `Vencido hace ${-dias}d`;
+    }
+    if (dias === 0) {
+      return 'Vence hoy';
+    }
+    return `Vence en ${dias}d`;
+  }
+
+  handleAddOrUpdateEvent() {
+    const titleVal = this.eventTitle.trim() || (this.selectedEvent ? 'Evento' : 'Nuevo evento');
+    const fechaInicio = this.eventStartDate;
+    const fechaFin = this.eventEndDate || this.eventStartDate;
+    const color = this.eventLevel || 'Primary';
+
+    if (this.selectedEvent && this.selectedEvent.id) {
+      this.calendarioApi.update(this.selectedEvent.id, {
+        titulo: titleVal,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        color,
+      }).subscribe({
+        next: () => this.loadEventos(),
+        error: () => {},
+      });
+    } else {
+      this.calendarioApi.create({
+        titulo: titleVal,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        color,
+        tipo: 'PERSONAL',
+        todo_dia: true,
+        usuario_id: this.session.sesion?.user.id ?? '',
+      }).subscribe({
+        next: () => this.loadEventos(),
+        error: () => {},
+      });
     }
 
     this.closeModal();
@@ -508,6 +775,7 @@ export class CalenderComponent implements OnInit {
     this.eventEndDate = '';
     this.eventLevel = 'Primary';
     this.selectedEvent = null;
+    this.eventReadonly = false;
   }
 
   openModal() {

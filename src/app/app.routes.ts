@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { EcommerceComponent } from './pages/dashboard/ecommerce/ecommerce.component';
+import { DasiDashboardComponent } from './pages/dasi/dashboard/dashboard.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { FormElementsComponent } from './pages/forms/form-elements/form-elements.component';
 import { BasicTablesComponent } from './pages/tables/basic-tables/basic-tables.component';
@@ -16,30 +16,41 @@ import { ButtonsComponent } from './pages/ui-elements/buttons/buttons.component'
 import { ImagesComponent } from './pages/ui-elements/images/images.component';
 import { VideosComponent } from './pages/ui-elements/videos/videos.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
-import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
+import { AccessDeniedComponent } from './pages/auth-pages/access-denied/access-denied.component';
+import { dasiAuthGuard } from './shared/guards/dasi-auth.guard';
 import { CalenderComponent } from './pages/calender/calender.component';
+import { ListDemoComponent } from './pages/dasi/list-demo/list-demo.component';
+import { KanbanComponent } from './pages/dasi/kanban/kanban.component';
+import { WorkflowComponent } from './pages/dasi/workflow/workflow.component';
+import { InsightsComponent } from './pages/dasi/insights/insights.component';
+import { AdminDemoComponent } from './pages/dasi/admin-demo/admin-demo.component';
+import { AuditComponent } from './pages/dasi/audit/audit.component';
+import { InstitucionalComponent } from './pages/dasi/institucional/institucional.component';
+import { ProjectDetailComponent } from './pages/dasi/project-detail/project-detail.component';
+import { EvidenceComponent } from './pages/dasi/evidence/evidence.component';
+import { ObservationsComponent } from './pages/dasi/observations/observations.component';
 
 export const routes: Routes = [
   {
     path:'',
     component:AppLayoutComponent,
+    canActivate: [dasiAuthGuard],
     children:[
       {
         path: '',
-        component: EcommerceComponent,
+        component: DasiDashboardComponent,
         pathMatch: 'full',
-        title:
-          'Angular Ecommerce Dashboard | TailAdmin - Angular Admin Dashboard Template',
+        title: 'Dashboard | DASI V.01',
       },
       {
         path:'calendar',
         component:CalenderComponent,
-        title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
+        title:'Calendario | DASI V.01'
       },
       {
         path:'profile',
         component:ProfileComponent,
-        title:'Angular Profile Dashboard | TailAdmin - Angular Admin Dashboard Template'
+        title:'Perfil | DASI V.01'
       },
       {
         path:'form-elements',
@@ -102,18 +113,42 @@ export const routes: Routes = [
         component:VideosComponent,
         title:'Angular Videos Dashboard | TailAdmin - Angular Admin Dashboard Template'
       },
+      { path: 'proyectos', component: ListDemoComponent, data: { kind: 'projects' }, title: 'Proyectos | DASI V.01' },
+      { path: 'proyectos/:id', component: ProjectDetailComponent, title: 'Detalle de proyecto | DASI V.01' },
+      { path: 'mis-proyectos', component: ListDemoComponent, data: { kind: 'my-projects' }, title: 'Mis proyectos | DASI V.01' },
+      { path: 'proyectos-oficina', component: ListDemoComponent, data: { kind: 'my-office' }, title: 'Proyectos de mi oficina | DASI V.01' },
+      { path: 'proyectos-colaboracion', component: ListDemoComponent, data: { kind: 'collaborating' }, title: 'Donde colaboro | DASI V.01' },
+      { path: 'tareas', component: ListDemoComponent, data: { kind: 'tasks' }, title: 'Tareas | DASI V.01' },
+      { path: 'kanban', component: KanbanComponent, title: 'Kanban | DASI V.01' },
+{ path: 'workflow', component: WorkflowComponent, title: 'Workflow | DASI V.01' },
+{ path: 'actividades', component: ListDemoComponent, data: { kind: 'activities' }, title: 'Actividades | DASI V.01' },
+      { path: 'observaciones', component: ObservationsComponent, title: 'Observaciones | DASI V.01' },
+      { path: 'evidencias', component: EvidenceComponent, title: 'Evidencias | DASI V.01' },
+      { path: 'reportes', component: InsightsComponent, data: { kind: 'reports' }, title: 'Reportes | DASI V.01' },
+      { path: 'indicadores', component: InsightsComponent, data: { kind: 'indicators' }, title: 'Indicadores | DASI V.01' },
+{ path: 'usuarios', component: AdminDemoComponent, data: { kind: 'users' }, title: 'Usuarios | DASI V.01' },
+      { path: 'administracion', component: AdminDemoComponent, data: { kind: 'admin' }, title: 'Administración | DASI V.01' },
+      { path: 'roles', component: AdminDemoComponent, data: { kind: 'roles' }, title: 'Roles | DASI V.01' },
+      { path: 'permisos', component: AdminDemoComponent, data: { kind: 'permissions' }, title: 'Permisos | DASI V.01' },
+{ path: 'modulos', component: AdminDemoComponent, data: { kind: 'modules' }, title: 'Módulos | DASI V.01' },
+      { path: 'dependencias', component: AdminDemoComponent, data: { kind: 'dependencias' }, title: 'Dependencias | DASI V.01' },
+      { path: 'cargos', component: AdminDemoComponent, data: { kind: 'cargos' }, title: 'Cargos | DASI V.01' },
+      { path: 'configuracion', component: AdminDemoComponent, data: { kind: 'settings' }, title: 'Configuración | DASI V.01' },
+{ path: 'auditoria', component: AuditComponent, title: 'Auditoría | DASI V.01' },
+      { path: 'ayuda', component: InstitucionalComponent, data: { kind: 'ayuda' }, title: 'Ayuda | DASI V.01' },
+      { path: 'acerca', component: InstitucionalComponent, data: { kind: 'acerca' }, title: 'Acerca de DASI | DASI V.01' },
     ]
   },
   // auth pages
   {
     path:'signin',
     component:SignInComponent,
-    title:'Angular Sign In Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    title:'Ingreso | DASI V.01'
   },
   {
-    path:'signup',
-    component:SignUpComponent,
-    title:'Angular Sign Up Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    path:'acceso-no-autorizado',
+    component:AccessDeniedComponent,
+    title:'Acceso no autorizado | DASI V.01'
   },
   // error pages
   {

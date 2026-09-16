@@ -9,6 +9,10 @@ export class ThemeService {
   private themeSubject = new BehaviorSubject<Theme>('light');
   theme$ = this.themeSubject.asObservable();
 
+  get current(): Theme {
+    return this.themeSubject.value;
+  }
+
   constructor() {
     const savedTheme = (localStorage.getItem('theme') as Theme) || 'light';
     this.setTheme(savedTheme);

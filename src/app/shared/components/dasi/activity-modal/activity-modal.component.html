@@ -1,0 +1,150 @@
+<app-modal [isOpen]="isOpen" (close)="close.emit()" className="max-w-[680px] p-6 sm:p-8">
+  @if (taskError) {
+    <div class="py-6 text-center">
+      <div class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-error-500/10 text-error-500">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9a1.5 1.5 0 012.4 0l7.6 12a1.5 1.5 0 01-1.3 2.3H4a1.5 1.5 0 01-1.3-2.3l7.6-12z"/></svg>
+      </div>
+      <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">{{ taskError }}</p>
+      <button (click)="retryTask()" class="mt-4 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600">Reintentar</button>
+    </div>
+  } @else if (!task) {
+    <p class="text-sm text-gray-500 dark:text-gray-400">Cargando…</p>
+  } @else {
+    <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ task.titulo }}</h3>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ task.id }} · {{ task.proyecto.nombre }}</p>
+
+    <div class="mt-5 flex flex-wrap gap-1 rounded-xl bg-gray-50 p-1 dark:bg-gray-800">
+      @for (tab of tabs; track tab) {
+        <button (click)="activeTab = tab" class="flex-1 rounded-lg px-3 py-1.5 text-sm font-medium"
+          [class.bg-white]="activeTab === tab"
+          [class.shadow-theme-xs]="activeTab === tab"
+          [class.text-brand-500]="activeTab === tab"
+          [class.text-gray-500]="activeTab !== tab"
+          [class.dark:bg-gray-900]="activeTab === tab"
+          [class.dark:text-white/90]="activeTab === tab"
+          [class.dark:text-gray-400]="activeTab !== tab">
+          {{ tab === 'detalle' ? 'Detalle' : (tab === 'evidencias' ? 'Evidencias' : 'Observaciones') }}
+        </button>
+      }
+    </div>
+
+    @switch (activeTab) {
+      @case ('detalle') {
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">Responsable</span>
+            <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">{{ task.responsable.nombre }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">Límite</span>
+            <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">{{ formatDate(task.fecha_fin_estimada) }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">Prioridad</span>
+            <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">{{ task.prioridad }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">Estado</span>
+            <p class="mt-1"><app-badge size="sm" [color]="taskBadge(task.estado)">{{ estadoLabel(task.estado) }}</app-badge></p>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-sm text-gray-500 dark:text-gray-400">Avance</span>
+            <div class="mt-2 flex items-center gap-3">
+              <div class="h-2 flex-1 rounded-full bg-gray-200 dark:bg-gray-800">
+                <div class="h-full rounded-full bg-brand-500" [style.width.%]="task.progreso"></div>
+              </div>
+              <span class="text-sm font-medium text-gray-800 dark:text-white/90">{{ task.progreso }}%</span>
+            </div>
+          </div>
+        </div>
+
+        @if (nextStatuses.length > 0) {
+          <div class="mt-6">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Cambiar estado</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              @for (next of nextStatuses; track next) {
+                <button (click)="moveTo(next)" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:text-gray-300 dark:hover:border-brand-500 dark:hover:text-brand-400">
+                  → {{ next }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      @case ('evidencias') {
+        <section class="mt-6">
+          @if (evidences.length === 0) {
+            <p class="text-sm text-gray-500 dark:text-gray-400">Sin evidencias registradas.</p>
+          }
+          <div class="space-y-2">
+            @for (evidence of evidences; track evidence.id) {
+              <div class="rounded-xl border border-gray-100 p-3 dark:border-gray-800">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ evidence.nombre }}</p>
+                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Adjunto · {{ evidence.usuario.nombre }}</p>
+                  </div>
+                  <app-badge size="sm" [color]="evidenceBadge(evidence.estado)">{{ evidenceLabel(evidence.estado) }}</app-badge>
+                </div>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  @if (evidence.estado === 'Pendiente' || evidence.estado === 'Observada') {
+                    <button (click)="reviewEvidence(evidence.id)" class="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400">Revisar</button>
+                  }
+                  @if (evidence.estado === 'EnRevision' || evidence.estado === 'Observada') {
+                    <button (click)="approveEvidence(evidence.id)" class="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:border-success-500 hover:text-success-600 dark:border-gray-700 dark:text-gray-400">Aprobar</button>
+                  }
+                  @if (evidence.estado !== 'Observada') {
+                    <button (click)="markEvidenceObserved(evidence.id)" class="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:border-error-500 hover:text-error-600 dark:border-gray-700 dark:text-gray-400">Observar</button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+            <select [(ngModel)]="evidenceType" class="h-9 rounded-lg border border-gray-200 bg-white px-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              @for (type of evidenceTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+            <input [(ngModel)]="newEvidence" placeholder="Nombre del documento" class="h-9 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" />
+            <button (click)="registerEvidence()" class="h-9 rounded-lg bg-brand-500 px-3 text-sm font-medium text-white hover:bg-brand-600">Registrar</button>
+          </div>
+        </section>
+      }
+
+      @case ('observaciones') {
+        <section class="mt-6">
+          @if (observations.length === 0) {
+            <p class="text-sm text-gray-500 dark:text-gray-400">Sin observaciones registradas.</p>
+          }
+          <div class="space-y-2">
+            @for (observation of observations; track observation.id) {
+              <div class="rounded-xl border border-gray-100 p-3 dark:border-gray-800">
+                <p class="text-sm text-gray-800 dark:text-white/90">{{ observation.contenido }}</p>
+                <div class="mt-2 flex items-center justify-between gap-2">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ observation.usuario.nombre }} · {{ formatDate(observation.created_at) }}</p>
+                  <app-badge size="sm" [color]="observationBadge(observation.estado)">{{ observation.estado }}</app-badge>
+                </div>
+                @if (observation.estado === 'Abierta') {
+                  <div class="mt-2 flex gap-2">
+                    <button (click)="respond(observation.id)" class="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:border-brand-500 hover:text-brand-500 dark:border-gray-700 dark:text-gray-400">Responder</button>
+                    <button (click)="resolve(observation.id)" class="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:border-success-500 hover:text-success-600 dark:border-gray-700 dark:text-gray-400">Resolver</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="mt-3 flex gap-2">
+            <input [(ngModel)]="newObservation" placeholder="Agregar observación" class="h-9 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" />
+            <button (click)="addObservation()" class="h-9 rounded-lg bg-brand-500 px-3 text-sm font-medium text-white hover:bg-brand-600">Agregar</button>
+          </div>
+        </section>
+      }
+    }
+
+    <div class="mt-7 flex justify-end">
+      <button (click)="close.emit()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">Cerrar</button>
+    </div>
+  }
+</app-modal>

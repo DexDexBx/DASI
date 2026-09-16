@@ -64,8 +64,31 @@
     <div [ngClass]="isApplicationMenuOpen ? 'flex' : 'hidden'"
       class="items-center justify-between w-full gap-4 px-5 py-4 xl:flex shadow-theme-md xl:justify-end xl:px-0 xl:shadow-none">
       <div class="flex items-center gap-2 2xsm:gap-3">
+        <!-- Dependencia activa -->
+        <span
+          class="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 xl:inline-flex dark:border-gray-800 dark:bg-white/[0.03]"
+        >
+          <svg class="shrink-0 fill-gray-500 dark:fill-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M4 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Zm4 7a1 1 0 0 0 0 2h8a1 1 0 1 0 0-2H8Zm0 4a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2H8Z" fill="" />
+          </svg>
+          <span class="max-w-52 truncate text-theme-xs font-medium text-gray-600 dark:text-gray-300">
+            {{ (session.sesion$ | async)?.dependencia?.nombre ?? '—' }}
+          </span>
+        </span>
         <!-- ThemeToggleButton placeholder -->
         <app-theme-toggle-button />
+        <!-- Calendario -->
+        <a
+          routerLink="/calendar"
+          title="Calendario"
+          aria-label="Ir al calendario"
+          class="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-gray-700 h-11 w-11 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        >
+          <svg class="fill-none" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4.5" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5" />
+            <path d="M6.5 2.75V6M13.5 2.75V6M3 8.75h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </a>
         <!-- NotificationDropdown placeholder -->
         <app-notification-dropdown />
       </div>

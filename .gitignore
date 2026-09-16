@@ -40,3 +40,27 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+# ==========================================
+# DASI Backend / NestJS
+# ==========================================
+
+/api/node_modules/
+/api/dist/
+/api/.env
+/api/.env.*
+!/api/.env.example
+
+# Prisma
+/api/prisma/*.db
+/api/prisma/*.db-journal
+
+# Build / TypeScript
+/api/*.tsbuildinfo
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example

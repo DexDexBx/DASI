@@ -1,0 +1,85 @@
+@if (kind === 'ayuda') {
+  <app-dasi-module-header title="Ayuda" description="Manual rápido de DASI: responde cómo funciona cada parte del flujo institucional." />
+} @else {
+  <app-dasi-module-header title="Acerca de DASI" description="Digitalización, Administración y Seguimiento Institucional." />
+}
+
+<div class="space-y-6">
+  @if (kind === 'ayuda') {
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Preguntas frecuentes</h3>
+      </div>
+      <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Pulsa una pregunta para ver la respuesta.</p>
+      <div class="mt-4 space-y-2">
+        @for (faq of faqs; track faq.question; let i = $index) {
+          <div class="rounded-xl border border-gray-200 dark:border-gray-800">
+            <button
+              (click)="toggleFaq(i)"
+              class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+            >
+              <span class="text-sm font-medium text-gray-800 dark:text-white/90">{{ faq.question }}</span>
+              <svg
+                class="h-4 w-4 shrink-0 text-gray-400 transition-transform"
+                [class.rotate-180]="openFaq === i"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            @if (openFaq === i) {
+              <p class="border-t border-gray-100 px-4 py-3 text-sm leading-6 text-gray-600 dark:border-gray-800 dark:text-gray-400">
+                {{ faq.answer }}
+              </p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Accesos rápidos</h3>
+      <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Atajos a los módulos más usados del flujo.</p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button (click)="irA('/proyectos')" class="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Proyectos
+        </button>
+        <button (click)="irA('/workflow')" class="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Workflow
+        </button>
+        <button (click)="irA('/workflow')" class="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Crear / Añadir etapas y actividades
+        </button>
+        <button (click)="irA('/kanban')" class="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Kanban
+        </button>
+        <button (click)="irA('/calendar')" class="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Calendario
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="grid gap-4 sm:grid-cols-2">
+      @for (card of cards; track card.title) {
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="card.icon" /></svg>
+          </span>
+          <h3 class="mt-3 font-semibold text-gray-800 dark:text-white/90">{{ card.title }}</h3>
+          <p class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">{{ card.body }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">Estado del proyecto</h3>
+      <p class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+        DASI V.01 se encuentra en fase de diseño, navegación y validación visual, desarrollándose módulo por módulo.
+        Esta versión ya incluye la lógica del flujo: al aprobar un proyecto se activan las fases y las actividades base,
+        el workflow de cada proyecto puede crearse desde Seguimiento → Crear workflow, y el calendario se sincroniza
+        con las actividades que tienen responsable y fecha. La arquitectura de datos (NestJS y PostgreSQL) corresponde
+        a fases posteriores.
+      </p>
+    </div>
+  }
+</div>

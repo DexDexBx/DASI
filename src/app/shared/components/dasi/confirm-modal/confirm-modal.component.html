@@ -1,0 +1,14 @@
+<app-modal [isOpen]="isOpen" (close)="close.emit()" className="max-w-[460px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ title }}</h3>
+  @if (message) {
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ message }}</p>
+  }
+  <div class="mt-8 flex justify-end gap-3">
+    <button (click)="close.emit()" class="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+      {{ cancelLabel }}
+    </button>
+    <button (click)="confirm.emit()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
+      {{ confirmLabel }}
+    </button>
+  </div>
+</app-modal>

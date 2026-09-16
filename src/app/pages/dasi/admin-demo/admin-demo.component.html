@@ -1,0 +1,995 @@
+<app-dasi-module-header [title]="title" [description]="description" [actionLabel]="headerAction" (action)="action()" />
+
+@if (loading) {
+  <p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">Cargando datos de la API…</p>
+}
+
+@if (kind === 'admin' && !loading) {
+  <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-500/30 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/20">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Usuarios</p>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+          <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 19a4 4 0 0 0-8 0M15.5 11.5a3 3 0 1 0-2.6-1.5M19 19a4 4 0 0 0-2.8-3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="11" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+        </span>
+      </div>
+      <p class="mt-3 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ usuarios.length }}</p>
+      <p class="mt-1 text-xs text-gray-400">{{ usuariosActivos }} activos · {{ cargos.length }} cargos</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-500/30 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/20">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Roles y permisos</p>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+          <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3 5 6v4.5c0 4 2.6 7.5 7 9 4.4-1.5 7-5 7-9V6l-4-3H9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <p class="mt-3 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ roles.length }} <span class="text-lg text-gray-400">·</span> {{ permisosTotales }}</p>
+      <p class="mt-1 text-xs text-gray-400">roles · acciones en catálogo</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-500/30 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/20">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Módulos</p>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+          <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6ZM4 16a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </span>
+      </div>
+      <p class="mt-3 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ modulosVisibles() }}<span class="text-base font-normal text-gray-400">/{{ modulos.length }}</span></p>
+      <p class="mt-1 text-xs text-gray-400">visibles del menú</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-500/30 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/20">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Proyectos</p>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+          <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5a2 2 0 0 1 2-2h5l2 2h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </span>
+      </div>
+      <p class="mt-3 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ proyectos.length }}</p>
+      <p class="mt-1 text-xs text-gray-400">{{ proyectosActivos }} activos</p>
+    </div>
+  </div>
+  <h3 class="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">Acceso rápido</h3>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    @for (card of adminCards; track card.kind) {
+      <button
+        (click)="card.url ? goUrl(card.url) : go(card.kind)"
+        class="group flex flex-col items-start gap-4 rounded-2xl border border-gray-200 bg-white p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:border-brand-500/50 hover:shadow-theme-md dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/40"
+      >
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 transition group-hover:scale-105 dark:bg-brand-500/15">
+          <span class="h-6 w-6" [innerHTML]="card.icon"></span>
+        </span>
+        <span class="w-full">
+          <span class="flex items-center justify-between">
+            <span class="text-base font-semibold text-gray-800 dark:text-white/90">{{ card.title }}</span>
+            <span class="text-xl font-semibold text-gray-800 dark:text-white/90">{{ card.count }}</span>
+          </span>
+          <span class="mt-1 block text-xs leading-relaxed text-gray-500 dark:text-gray-400">{{ card.desc }}</span>
+        </span>
+        <span class="inline-flex -mt-1 items-center gap-1 text-xs font-medium text-brand-500 opacity-0 transition-opacity group-hover:opacity-100">
+          Abrir
+          <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h11"/></svg>
+        </span>
+      </button>
+    }
+  </div>
+}
+
+@if (kind === 'roles' && !loading) {
+  <div class="mb-5">
+    <div class="relative max-w-sm">
+      <input
+        [(ngModel)]="rolSearch"
+        placeholder="Buscar rol por nombre…"
+        class="h-11 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-4 text-sm text-gray-700 placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+      />
+    </div>
+  </div>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (role of filteredRoles; track role.id) {
+      <article class="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-500 dark:bg-brand-500/15">{{ role.nombre.slice(0, 2).toUpperCase() }}</span>
+          <div class="min-w-0 flex-1">
+            <h2 class="truncate text-base font-semibold text-gray-800 dark:text-white/90">{{ role.nombre }}</h2>
+            <p class="text-xs text-gray-400">Alcance: {{ role.scope }}</p>
+          </div>
+          <button (click)="openEditRol(role)" class="text-sm font-medium text-brand-500 hover:text-brand-600">Editar</button>
+        </div>
+        <p class="mt-4 line-clamp-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">{{ role.descripcion }}</p>
+        <div class="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-gray-50 p-3 text-center dark:bg-gray-900/40">
+          <div>
+            <p class="text-xs text-gray-400">Permisos</p>
+            <p class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">{{ rolPermisoCount(role.id) }}<span class="text-xs font-normal text-gray-400">/{{ permisosTotales }}</span></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Módulos</p>
+            <p class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">{{ roleVisibleModulesCount(role.id) }}<span class="text-xs font-normal text-gray-400">/{{ modulos.length }}</span></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400">Usuarios</p>
+            <p class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">{{ rolUsersCount(role.id) }}</p>
+          </div>
+        </div>
+        @if (roleModules(role.id).length > 0) {
+          <div class="mt-4">
+            <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">Módulos que puede ver</p>
+            <div class="flex flex-wrap gap-1.5">
+              @for (mod of roleModules(role.id); track mod.id) {
+                <app-badge size="sm" color="info">{{ mod.nombre }}</app-badge>
+              }
+            </div>
+          </div>
+        }
+        <div class="mt-auto flex items-center gap-3 border-t border-gray-100 pt-4 dark:border-gray-800">
+          <div class="mt-0">
+            <button (click)="selectedRol = role.id" class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Ver detalle</button>
+          </div>
+          <div class="ml-auto flex items-center gap-3">
+            <button (click)="manageRolePermissions(role)" class="inline-flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-400 dark:hover:bg-brand-500/25">
+              Permisos
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h11"/></svg>
+            </button>
+            <button (click)="openDeleteRol(role)" class="text-sm font-medium text-error-500 hover:text-error-600">Eliminar</button>
+          </div>
+        </div>
+      </article>
+    } @empty {
+      <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{{ roles.length === 0 ? 'Sin roles registrados.' : 'Sin roles que coincidan con la búsqueda.' }}</p>
+    }
+  </div>
+}
+
+@if (kind === 'permissions' && !loading) {
+  <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white/90">Matriz de permisos</h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {{ rolById(selectedRolId)?.nombre }}
+          <span class="text-gray-400">·</span>
+          <span class="text-brand-500">alcance {{ rolById(selectedRolId)?.scope }}</span>
+          <span class="text-gray-400">·</span>
+          {{ grantedTotal(selectedRolId) }} de {{ permisosTotales }} permisos asignados
+        </p>
+        <p class="mt-1 text-xs text-gray-400">{{ scopeDescription(rolById(selectedRolId)?.scope ?? 'PROPIO') }}</p>
+      </div>
+      <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        Rol:
+        <select [(ngModel)]="selectedRolId" (ngModelChange)="onRolChange()" class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+          @for (role of roles; track role.id) {
+            <option [value]="role.id">{{ role.nombre }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="relative sm:max-w-xs sm:flex-1">
+        <input
+          [(ngModel)]="moduleSearch"
+          placeholder="Buscar módulo…"
+          class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-4 text-sm text-gray-700 placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="permViewFilter = 'todos'" class="rounded-lg px-3 py-2 text-sm font-medium" [class.bg-brand-500]="permViewFilter === 'todos'" [class.text-white]="permViewFilter === 'todos'" [class.text-gray-500]="permViewFilter !== 'todos'" [class.hover:bg-gray-100]="permViewFilter !== 'todos'" [class.dark:text-gray-400]="permViewFilter !== 'todos'">Todos</button>
+        <button (click)="permViewFilter = 'acceso'" class="rounded-lg px-3 py-2 text-sm font-medium" [class.bg-brand-500]="permViewFilter === 'acceso'" [class.text-white]="permViewFilter === 'acceso'" [class.text-gray-500]="permViewFilter !== 'acceso'" [class.hover:bg-gray-100]="permViewFilter !== 'acceso'" [class.dark:text-gray-400]="permViewFilter !== 'acceso'">Solo con acceso</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[840px]">
+        <thead>
+          <tr>
+            <th class="pb-4 text-left text-sm font-medium text-gray-500 dark:text-gray-400">Módulo</th>
+            @for (action of permActions; track action) {
+              <th class="pb-4 text-center text-xs font-medium text-gray-500 dark:text-gray-400">{{ action }}</th>
+            }
+            <th class="pb-4 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Pendiente</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (module of filteredModulosMatriz; track module.id) {
+            <tr class="border-t border-gray-100 dark:border-gray-800">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2">
+                  <p class="font-medium text-gray-800 dark:text-white/90">{{ module.nombre }}</p>
+                  <button (click)="toggleModuleDraft(module.id, true)" class="text-sm font-medium text-brand-500 hover:underline">Todo</button>
+                  <button (click)="toggleModuleDraft(module.id, false)" class="text-sm font-medium text-gray-400 hover:underline">Nada</button>
+                </div>
+                <p class="text-xs text-gray-400">{{ moduleEnabled(module.id) ? 'habilitado' : 'deshabilitado' }}</p>
+              </td>
+              @for (action of permActions; track action) {
+                <td class="py-3 text-center">
+                  @if (moduleActions(module.id).includes(action)) {
+                    <input
+                      type="checkbox"
+                      [checked]="hasDraft(permisoId(module.id, action))"
+                      (change)="toggleDraftPermiso(module.id, action)"
+                      class="h-4 w-4 accent-brand-500"
+                    />
+                  } @else {
+                    <span class="text-gray-300 dark:text-gray-700">·</span>
+                  }
+                </td>
+              }
+              <td class="py-3 text-right font-mono text-xs text-gray-500 dark:text-gray-400">{{ moduleDraftPendingCount(module.id) }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="12" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">Sin módulos{{ moduleSearch ? ' que coincidan con la búsqueda' : '' }}.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-gray-400">
+        Marca o desmarca las acciones de cada módulo para el rol seleccionado y presiona Guardar.
+        El alcance indica <span class="text-gray-600 dark:text-gray-300">{{ scopeDescription(rolById(selectedRolId)?.scope ?? 'PROPIO') }}</span>
+      </p>
+      <div class="flex items-center gap-3">
+        @if (permSavingError) {
+          <p class="text-sm text-error-500">{{ permSavingError }}</p>
+        }
+        <button (click)="cancelPermisos()" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+        <button
+          [disabled]="savingPerms || !isDraftDirty()"
+          (click)="savePermisos()"
+          class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ savingPerms ? 'Guardando…' : isDraftDirty() ? 'Guardar permisos' : 'Sin cambios' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (kind === 'modules' && !loading) {
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="relative sm:max-w-xs sm:flex-1">
+      <input
+        [(ngModel)]="moduloSearch"
+        placeholder="Buscar módulo…"
+        class="h-11 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-4 text-sm text-gray-700 placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <select [(ngModel)]="moduloEstadoFilter" class="h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 sm:w-48">
+      <option value="">Todos los estados</option>
+      <option value="activo">Habilitados</option>
+      <option value="inactivo">Deshabilitados</option>
+    </select>
+  </div>
+  <div class="space-y-4">
+    @for (module of filteredModulos; track module.id) {
+      <article class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-4">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-semibold text-gray-800 dark:text-white/90">{{ module.nombre }}</h2>
+                <app-badge size="sm" [color]="module.activo ? 'success' : 'error'">{{ module.activo ? 'Habilitado' : 'Deshabilitado' }}</app-badge>
+              </div>
+              <p class="mt-1 text-xs text-gray-400">{{ module.slug }}{{ module.descripcion ? ' · ' + module.descripcion : '' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-gray-400">{{ modulePermisos(module.id).length }} acción{{ modulePermisos(module.id).length === 1 ? '' : 'es' }}</span>
+            <button (click)="toggleModule(module)" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">{{ module.activo ? 'Deshabilitar' : 'Habilitar' }}</button>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-1.5 border-t border-gray-100 pt-4 dark:border-gray-800">
+          @for (permiso of modulePermisos(module.id); track permiso.id) {
+            <span class="group inline-flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              {{ permiso.accion }}
+              <button
+                (click)="openDeletePermiso(permiso)"
+                title="Quitar la acción del catálogo"
+                class="text-gray-400 transition group-hover:text-error-500 hover:text-error-500 dark:text-gray-500 dark:group-hover:text-error-500"
+              >
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </span>
+          }
+          @if (moduleActionsAvailable(module.id).length > 0) {
+            <button
+              (click)="openCreatePermiso(module.id, module.nombre)"
+              class="inline-flex items-center gap-1 rounded-lg border border-dashed border-gray-300 px-2.5 py-1 text-xs font-medium text-brand-500 hover:border-brand-500 hover:bg-brand-50 dark:border-gray-700 dark:hover:border-brand-500/50 dark:hover:bg-brand-500/10"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              Añadir acción
+            </button>
+          } @else {
+            <span class="text-xs text-gray-400">Todas las acciones disponibles ya están en el catálogo.</span>
+          }
+        </div>
+      </article>
+    } @empty {
+      <p class="text-sm text-gray-500 dark:text-gray-400">{{ modulos.length === 0 ? 'Sin módulos registrados.' : 'Sin módulos que coincidan con los filtros.' }}</p>
+    }
+  </div>
+}
+
+@if (kind === 'dependencias' && !loading) {
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (dep of dependencias; track dep.id) {
+      <article class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-semibold text-brand-500 dark:bg-brand-500/15">{{ dep.code }}</span>
+          <app-badge size="sm" [color]="dep.activa ? 'success' : 'error'">{{ dep.activa ? 'Activa' : 'Inactiva' }}</app-badge>
+        </div>
+        <h2 class="mt-3 text-base font-semibold text-gray-800 dark:text-white/90">{{ dep.nombre }}</h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ dep.tipo }} · Directora/Director: {{ dep.director }}</p>
+        <div class="mt-4 flex gap-6 border-t border-gray-100 pt-4 text-sm dark:border-gray-800">
+          <div>
+            <p class="text-gray-500 dark:text-gray-400">Usuarios</p>
+            <p class="mt-1 font-semibold text-gray-800 dark:text-white/90">{{ usuariosCountByDep(dep.id) }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 dark:text-gray-400">Proyectos</p>
+            <p class="mt-1 font-semibold text-gray-800 dark:text-white/90">{{ proyectosCountByDep(dep.id) }}</p>
+          </div>
+          <div class="ml-auto">
+            <app-badge size="sm">{{ dep.parent?.nombre ?? 'Raíz' }}</app-badge>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <button (click)="selectedDep = dep.id" class="text-sm font-medium text-brand-500 hover:text-brand-600">Ver detalle</button>
+          <button (click)="openEditDep(dep)" class="ml-auto text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Editar</button>
+          <button (click)="toggleDepActiva(dep)" class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">{{ dep.activa ? 'Desactivar' : 'Activar' }}</button>
+        </div>
+      </article>
+    } @empty {
+      <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">Sin dependencias registradas.</p>
+    }
+  </div>
+}
+
+@if (kind === 'cargos' && !loading) {
+  <div class="mb-6 rounded-2xl border border-brand-100 bg-brand-50/50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
+    <p class="text-sm text-gray-600 dark:text-gray-300">
+      <span class="font-medium text-brand-600 dark:text-brand-400">¿Cargos = propósito?</span> Sí: un cargo expresa <em>el rol que cumple</em> cada persona dentro de la institución (p. ej. "Asistente de Dirección"). Se asigna a los usuarios (uno o varios) y es independiente de la oficina o escuela donde trabaje.
+    </p>
+  </div>
+  <div class="mb-5">
+    <div class="relative max-w-sm">
+      <input
+        [(ngModel)]="cargoSearch"
+        placeholder="Buscar cargo o propósito…"
+        class="h-11 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-4 text-sm text-gray-700 placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+      />
+    </div>
+  </div>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (cargo of filteredCargos; track cargo.id) {
+      <article class="group flex flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-brand-500/40 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] dark:hover:border-brand-500/30">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg>
+          </span>
+          <div class="min-w-0 flex-1">
+            <h2 class="truncate text-base font-semibold text-gray-800 dark:text-white/90">{{ cargo.nombre }}</h2>
+            <p class="text-xs text-gray-400">{{ cargoUsersCount(cargo.id) }} usuario{{ cargoUsersCount(cargo.id) === 1 ? '' : 's' }}</p>
+          </div>
+          <button (click)="openEditCargo(cargo)" class="text-sm font-medium text-brand-500 hover:text-brand-600">Editar</button>
+        </div>
+        <p class="mt-4 line-clamp-3 min-h-[3.75rem] text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          {{ cargo.descripcion || 'Sin propósito definido todavía.' }}
+        </p>
+        @if (cargoUserNames(cargo.id)) {
+          <div class="mt-4 border-t border-gray-100 pt-3 dark:border-gray-800">
+            <p class="text-xs text-gray-400">Lo ocupan:</p>
+            <p class="mt-1 truncate text-sm text-gray-600 dark:text-gray-300">{{ cargoUserNames(cargo.id) }}{{ cargoUsersCount(cargo.id) > 3 ? '…' : '' }}</p>
+          </div>
+        }
+        <div class="mt-4 flex items-center gap-3">
+          <button
+            (click)="go('users')"
+            class="ml-auto text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >Asignar usuarios</button>
+          <button (click)="openDeleteCargo(cargo)" class="text-sm font-medium text-error-500 hover:text-error-600">Eliminar</button>
+        </div>
+      </article>
+    } @empty {
+      <p class="col-span-full text-sm text-gray-500 dark:text-gray-400">{{ cargos.length === 0 ? 'Sin cargos registrados.' : 'Sin cargos que coincidan con la búsqueda.' }}</p>
+    }
+  </div>
+}
+
+@if (kind === 'users' && !loading) {
+  <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
+    <div class="mb-5 grid gap-3 lg:grid-cols-12">
+      <div class="relative lg:col-span-5">
+        <input
+          [(ngModel)]="userSearch"
+          placeholder="Buscar por nombre, correo o cuenta…"
+          class="h-10 w-full rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        />
+      </div>
+      <select
+        [(ngModel)]="userFilterRol"
+        class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 lg:col-span-3"
+      >
+        <option value="">Todos los roles</option>
+        @for (rol of roles; track rol.id) {
+          <option [value]="rol.id">{{ rol.nombre }}</option>
+        }
+      </select>
+      <select
+        [(ngModel)]="userFilterDep"
+        class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 lg:col-span-2"
+      >
+        <option value="">Toda la org.</option>
+        @for (dep of dependencias; track dep.id) {
+          <option [value]="dep.id">{{ dep.nombre }}</option>
+        }
+      </select>
+      <select
+        [(ngModel)]="userFilterEstado"
+        class="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 lg:col-span-2"
+      >
+        <option value="">Cualquier estado</option>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[900px]">
+        <thead class="border-y border-gray-100 text-left dark:border-gray-800">
+          <tr>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Usuario</th>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Oficinas / Escuelas</th>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Cargos</th>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Roles</th>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400">Estado</th>
+            <th class="py-3 text-xs font-medium text-gray-500 dark:text-gray-400"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+          @for (usuario of filteredUsers; track usuario.id) {
+            <tr>
+              <td class="py-4 pr-4">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-500 dark:bg-brand-500/15">{{ usuario.initials || usuario.nombre.slice(0, 2).toUpperCase() }}</span>
+                  <div class="min-w-0">
+                    <p class="truncate font-medium text-gray-800 dark:text-white/90">{{ usuario.nombre }}</p>
+                    <p class="truncate text-xs text-gray-400">{{ usuario.email }} · @{{ usuario.account }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 pr-4">
+                <div class="flex flex-wrap gap-1.5">
+                  @for (dep of userDeps(usuario); track dep.id) {
+                    <app-badge size="sm" [color]="isPrincipalUserDep(usuario, dep.id) ? 'primary' : 'info'">{{ isPrincipalUserDep(usuario, dep.id) ? '★ ' : '' }}{{ dep.nombre }}</app-badge>
+                  } @empty {
+                    <span class="text-xs text-gray-400">—</span>
+                  }
+                </div>
+              </td>
+              <td class="py-4 pr-4">
+                <div class="flex flex-wrap gap-1.5">
+                  @for (cargo of userCargos(usuario); track cargo.id) {
+                    <app-badge size="sm" color="light">{{ cargo.nombre }}</app-badge>
+                  } @empty {
+                    <span class="text-xs text-gray-400">—</span>
+                  }
+                </div>
+              </td>
+              <td class="py-4 pr-4">
+                <div class="flex flex-wrap gap-1.5">
+                  @for (rol of userRols(usuario); track rol.id) {
+                    <app-badge size="sm" color="dark">{{ rol.nombre }}</app-badge>
+                  } @empty {
+                    <span class="text-xs text-gray-400">—</span>
+                  }
+                </div>
+              </td>
+              <td class="py-4">
+                <app-badge size="sm" [color]="usuario.estado === 'Activo' ? 'success' : 'error'">{{ usuario.estado }}</app-badge>
+              </td>
+              <td class="py-4 text-right">
+                <div class="flex items-center justify-end gap-3">
+                  <button (click)="selectedUser = usuario.id" class="text-sm font-medium text-brand-500 hover:text-brand-600">Ver</button>
+                  <button (click)="openEditUser(usuario)" class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Editar</button>
+                  <button
+                    (click)="toggleUserEstado(usuario)"
+                    [disabled]="isSelf(usuario)"
+                    class="text-sm font-medium text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:disabled:text-gray-700"
+                  >{{ usuario.estado === 'Activo' ? 'Desactivar' : 'Activar' }}</button>
+                  <button (click)="openDeleteUser(usuario)" [disabled]="isSelf(usuario)" class="text-sm font-medium text-error-500 hover:text-error-600 disabled:cursor-not-allowed disabled:text-gray-300">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (filteredUsers.length === 0) {
+        <p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">Sin usuarios que coincidan con los filtros.</p>
+      }
+    </div>
+  </div>
+}
+
+@if (kind === 'settings' && !loading) {
+  <div class="grid gap-6 xl:grid-cols-3">
+    <section class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h2 class="font-semibold text-gray-800 dark:text-white/90">Roles y permisos</h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ roles.length }} roles registrados · {{ permisosTotales }} permisos en el catálogo.</p>
+      <div class="mt-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+        <p>{{ modulosVisibles() }} módulos visibles de {{ modulos.length }}</p>
+        <p>{{ modulos.length - modulosVisibles() }} módulos ocultos del menú</p>
+      </div>
+    </section>
+    <section class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h2 class="font-semibold text-gray-800 dark:text-white/90">Organización</h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Dependencias y personal registrados en la plataforma.</p>
+      <div class="mt-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+        <p>{{ dependenciasActivas() }} dependencias activas de {{ dependencias.length }}</p>
+        <p>{{ usuarios.length }} usuarios en el directorio ({{ usuariosActivos }} activos)</p>
+        <p>{{ cargos.length }} cargos en la plantilla</p>
+      </div>
+    </section>
+    <section class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h2 class="font-semibold text-gray-800 dark:text-white/90">Proyectos</h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Carga operativa registrada en el sistema.</p>
+      <div class="mt-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+        <p>{{ proyectos.length }} proyectos registrados</p>
+        <p>{{ proyectosActivos }} proyectos activos</p>
+      </div>
+    </section>
+  </div>
+}
+
+<app-dasi-detail-modal
+  [isOpen]="selectedRol !== ''"
+  [title]="selectedRol ? rolById(selectedRol)?.nombre || '' : ''"
+  [items]="selectedRol ? [{ label: 'Descripción', value: rolById(selectedRol)?.descripcion || '' }, { label: 'Alcance', value: rolById(selectedRol)?.scope || '' }, { label: 'Permisos', value: rolPermisoCount(selectedRol) + ' de ' + permisosTotales }, { label: 'Usuarios', value: rolUsersCount(selectedRol) + '' }] : []"
+  (close)="selectedRol = ''"
+/>
+
+<app-dasi-detail-modal
+  [isOpen]="selectedDep !== ''"
+  [title]="selectedDep ? depById(selectedDep)?.nombre || '' : ''"
+  [items]="selectedDep ? [{ label: 'Código', value: depById(selectedDep)?.code || '' }, { label: 'Tipo', value: depById(selectedDep)?.tipo || '' }, { label: 'Director/a', value: depById(selectedDep)?.director || '' }, { label: 'Usuarios', value: usuariosCountByDep(selectedDep) + '' }, { label: 'Proyectos', value: proyectosCountByDep(selectedDep) + '' }, { label: 'Estado', value: depById(selectedDep)?.activa ? 'Activa' : 'Inactiva' }] : []"
+  (close)="selectedDep = ''"
+/>
+
+<app-dasi-detail-modal
+  [isOpen]="selectedUser !== ''"
+  [title]="selectedUserData?.nombre ?? ''"
+  [items]="selectedUserItems"
+  (close)="selectedUser = ''"
+/>
+
+<!-- Modal: Nuevo rol -->
+<app-modal [isOpen]="createRolOpen" (close)="createRolOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">Nuevo rol</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Se registrará en la base de datos con su alcance.</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+      <input
+        [(ngModel)]="newRolNombre"
+        placeholder="Ej. COORDINADOR_TI"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+      <textarea
+        [(ngModel)]="newRolDescripcion"
+        rows="3"
+        placeholder="Alcance y propósito del rol"
+        class="w-full resize-none rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      ></textarea>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Alcance</label>
+      <select [(ngModel)]="newRolScope" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        @for (scope of rolScopes; track scope) {
+          <option [value]="scope">{{ scope }}</option>
+        }
+      </select>
+      <p class="mt-1.5 text-xs text-gray-400">{{ scopeDescription(newRolScope) }}</p>
+    </div>
+    @if (createRolError) {
+      <p class="text-sm text-error-500">{{ createRolError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="createRolOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingRol" (click)="submitRol()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingRol ? 'Guardando…' : 'Crear rol' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Editar rol -->
+<app-modal [isOpen]="editRolOpen" (close)="editRolOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">Editar rol</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ editRol?.nombre }}</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+      <input
+        [(ngModel)]="editRolNombre"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+      <textarea
+        [(ngModel)]="editRolDescripcion"
+        rows="3"
+        class="w-full resize-none rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90"
+      ></textarea>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Alcance</label>
+      <select [(ngModel)]="editRolScope" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        @for (scope of rolScopes; track scope) {
+          <option [value]="scope">{{ scope }}</option>
+        }
+      </select>
+      <p class="mt-1.5 text-xs text-gray-400">{{ scopeDescription(editRolScope) }}</p>
+    </div>
+    @if (editRolError) {
+      <p class="text-sm text-error-500">{{ editRolError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="editRolOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingEditRol" (click)="submitEditRol()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingEditRol ? 'Guardando…' : 'Guardar cambios' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Eliminar rol -->
+<app-dasi-confirm-modal
+  [isOpen]="deleteRolOpen"
+  title="¿Eliminar rol?"
+  [message]="'Se eliminará el rol ' + (deleteRol?.nombre ?? '') + '. Esta acción no se puede deshacer.'"
+  confirmLabel="Sí, eliminar"
+  (close)="deleteRolOpen = false"
+  (confirm)="confirmDeleteRol()"
+>
+  @if (deleteRolError) {
+    <p class="mt-3 text-sm text-error-500">{{ deleteRolError }}</p>
+  }
+</app-dasi-confirm-modal>
+
+<!-- Modal: Nuevo módulo -->
+<app-modal [isOpen]="createModuloOpen" (close)="createModuloOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">Nuevo módulo</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Se registrará en la base de datos y podrá administrarse desde la matriz de permisos.</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Slug</label>
+      <input
+        [(ngModel)]="newModuloSlug"
+        placeholder="Ej. inventario"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+      <input
+        [(ngModel)]="newModuloNombre"
+        placeholder="Ej. Inventario"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+      <textarea
+        [(ngModel)]="newModuloDescripcion"
+        rows="3"
+        placeholder="Qué funcionalidad agrupa este módulo"
+        class="w-full resize-none rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      ></textarea>
+    </div>
+    <div>
+      <label class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+        <input
+          type="checkbox"
+          [(ngModel)]="newModuloActivo"
+          class="h-4 w-4 accent-brand-500"
+        />
+        Habilitado desde el inicio
+      </label>
+    </div>
+    @if (createModuloError) {
+      <p class="text-sm text-error-500">{{ createModuloError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="createModuloOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingModulo" (click)="submitModulo()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingModulo ? 'Guardando…' : 'Crear módulo' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Nueva acción de módulo -->
+<app-modal [isOpen]="createPermisoOpen" (close)="createPermisoOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">Añadir acción</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Se añadirá a la matriz del módulo <span class="font-medium text-gray-700 dark:text-gray-300">{{ createPermisoModuleName }}</span>. Así los roles podrán gestionar esta acción por separado.</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Acción</label>
+      <select [(ngModel)]="createPermisoAccion" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        <option value="">— Selecciona una acción —</option>
+        @for (accion of moduleActionsAvailable(createPermisoModuleId); track accion) {
+          <option [value]="accion">{{ accion }}</option>
+        }
+      </select>
+      <p class="mt-1 text-xs text-gray-400">Solo se muestran acciones que aún no existen en este módulo.</p>
+    </div>
+    @if (createPermisoError) {
+      <p class="text-sm text-error-500">{{ createPermisoError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="createPermisoOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingPermiso || !createPermisoAccion" (click)="submitPermiso()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingPermiso ? 'Guardando…' : 'Añadir acción' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Eliminar permiso -->
+<app-dasi-confirm-modal
+  [isOpen]="deletePermisoOpen"
+  title="¿Quitar acción?"
+  [message]="'Se quitará la acción «' + (deletePermiso?.accion ?? '') + '» del catálogo. Los roles que la tenían asignada la dejarán de tener.'"
+  confirmLabel="Sí, quitar"
+  (close)="deletePermisoOpen = false"
+  (confirm)="confirmDeletePermiso()"
+>
+  @if (deletePermisoError) {
+    <p class="mt-3 text-sm text-error-500">{{ deletePermisoError }}</p>
+  }
+</app-dasi-confirm-modal>
+
+<!-- Modal: Nueva/editar dependencia -->
+<app-modal [isOpen]="depModalOpen" (close)="depModalOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ editingDep ? 'Editar dependencia' : 'Nueva dependencia' }}</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Unidad institucional que participa en la plataforma.</p>
+  <div class="mt-6 space-y-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Código</label>
+        <input
+          [(ngModel)]="depFormCode"
+          placeholder="Ej. DEP-TI"
+          class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+        <select [(ngModel)]="depFormTipo" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+          @for (tipo of depTipos; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+      <input
+        [(ngModel)]="depFormNombre"
+        placeholder="Ej. Departamento de TI"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Director/a</label>
+      <input
+        [(ngModel)]="depFormDirector"
+        placeholder="Nombre de la autoridad"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Dependencia padre</label>
+      <select [(ngModel)]="depFormParentId" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        <option value="">— Sin padre (raíz) —</option>
+        @for (opt of dependencias; track opt.id) {
+          <option [value]="opt.id">{{ opt.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+        <input type="checkbox" [(ngModel)]="depFormActiva" class="h-4 w-4 accent-brand-500" />
+        Activa
+      </label>
+    </div>
+    @if (depFormError) {
+      <p class="text-sm text-error-500">{{ depFormError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="depModalOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingDep" (click)="submitDep()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingDep ? 'Guardando…' : editingDep ? 'Guardar cambios' : 'Crear dependencia' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Nuevo/editar cargo -->
+<app-modal [isOpen]="cargoModalOpen" (close)="cargoModalOpen = false" className="max-w-[480px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ editingCargo ? 'Editar cargo' : 'Nuevo cargo' }}</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Cargo de la plantilla institucional que se asigna a los usuarios.</p>
+  <div class="mt-6 space-y-4">
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+      <input
+        [(ngModel)]="cargoFormNombre"
+        placeholder="Ej. Asistente Administrativo"
+        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      />
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+      <textarea
+        [(ngModel)]="cargoFormDescripcion"
+        rows="3"
+        placeholder="Funciones o contexto del cargo"
+        class="w-full resize-none rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+      ></textarea>
+    </div>
+    @if (cargoFormError) {
+      <p class="text-sm text-error-500">{{ cargoFormError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="cargoModalOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingCargo" (click)="submitCargo()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingCargo ? 'Guardando…' : editingCargo ? 'Guardar cambios' : 'Crear cargo' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Eliminar cargo -->
+<app-dasi-confirm-modal
+  [isOpen]="deleteCargoOpen"
+  title="¿Eliminar cargo?"
+  [message]="'Se eliminará el cargo ' + (deleteCargo?.nombre ?? '') + '. Esta acción no se puede deshacer.'"
+  confirmLabel="Sí, eliminar"
+  (close)="deleteCargoOpen = false"
+  (confirm)="confirmDeleteCargo()"
+>
+  @if (deleteCargoError) {
+    <p class="mt-3 text-sm text-error-500">{{ deleteCargoError }}</p>
+  }
+</app-dasi-confirm-modal>
+
+<!-- Modal: Nuevo/editar usuario -->
+<app-modal [isOpen]="userModalOpen" (close)="userModalOpen = false" className="max-w-[720px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ editingUser ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
+  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Registra al usuario en el directorio y asígnale roles, cargos y una o varias oficinas o escuelas.</p>
+  <div class="mt-6 space-y-5">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre completo</label>
+        <input
+          [(ngModel)]="userFormNombre"
+          placeholder="Ej. Juan Pérez García"
+          class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Iniciales</label>
+        <div class="flex h-11 items-center gap-3 rounded-lg border border-gray-300 px-4 dark:border-gray-700">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-500 dark:bg-brand-500/15">{{ userInitialsPreview || '—' }}</span>
+          <span class="text-xs text-gray-400">se genera desde el nombre</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Correo institucional</label>
+        <input
+          [(ngModel)]="userFormEmail"
+          placeholder="usuario@dasi.local"
+          class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Cuenta</label>
+        <input
+          [(ngModel)]="userFormAccount"
+          placeholder="se genera desde el correo"
+          class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white/90 dark:placeholder:text-gray-500"
+        />
+      </div>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+      <select [(ngModel)]="userFormEstado" class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </div>
+
+    <div>
+      <span class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Oficinas / Escuelas (puede pertenecer a varias)</span>
+      <div class="grid max-h-56 gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/40">
+        @for (dep of dependencias; track dep.id) {
+          <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-300" [class.border-brand-500]="isUserDepSelected(dep.id)">
+            <input
+              type="checkbox"
+              [checked]="isUserDepSelected(dep.id)"
+              (change)="toggleUserDep(dep.id)"
+              class="h-4 w-4 accent-brand-500"
+            />
+            <span class="flex-1">{{ dep.nombre }}</span>
+            @if (isUserDepSelected(dep.id)) {
+              <label class="flex items-center gap-1 text-xs">
+                <input
+                  type="radio"
+                  [name]="'principalDep' + (editingUser ? editingUserId : 'new')"
+                  [checked]="userFormPrincipalDepId === dep.id"
+                  (change)="setPrincipalDep(dep.id)"
+                  class="h-3.5 w-3.5 accent-brand-500"
+                />
+                Principal
+              </label>
+            }
+          </label>
+        }
+      </div>
+      <p class="mt-1 text-xs text-gray-400">Marca una o varias. El usuario puede pertenecer a más de una oficina o escuela (p. ej. un asistente de dos escuelas profesionales).</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div>
+        <span class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Roles</span>
+        <div class="grid max-h-56 gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/40">
+          @for (rol of roles; track rol.id) {
+            <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-300">
+              <input
+                type="checkbox"
+                [checked]="isUserRolSelected(rol.id)"
+                (change)="toggleUserRol(rol.id)"
+                class="h-4 w-4 accent-brand-500"
+              />
+              <span class="flex-1">{{ rol.nombre }}</span>
+              @if (rol.scope === 'GLOBAL') {
+                <app-badge size="sm" color="info">global</app-badge>
+              }
+            </label>
+          }
+        </div>
+      </div>
+      <div>
+        <span class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Cargos</span>
+        <div class="grid max-h-56 gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/40">
+          @for (cargo of cargos; track cargo.id) {
+            <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-300">
+              <input
+                type="checkbox"
+                [checked]="isUserCargoSelected(cargo.id)"
+                (change)="toggleUserCargo(cargo.id)"
+                class="h-4 w-4 accent-brand-500"
+              />
+              <span class="flex-1">{{ cargo.nombre }}</span>
+            </label>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (userFormError) {
+      <p class="text-sm text-error-500">{{ userFormError }}</p>
+    }
+  </div>
+  <div class="mt-6 flex justify-end gap-3">
+    <button (click)="userModalOpen = false" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+    <button [disabled]="savingUser" (click)="submitUser()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50">{{ savingUser ? 'Guardando…' : editingUser ? 'Guardar cambios' : 'Crear usuario' }}</button>
+  </div>
+</app-modal>
+
+<!-- Modal: Eliminar usuario -->
+<app-dasi-confirm-modal
+  [isOpen]="deleteUserOpen"
+  title="¿Eliminar usuario?"
+  [message]="'Se dará de baja a ' + (deleteUser?.nombre ?? '') + ' (' + (deleteUser?.email ?? '') + '). Lo puedes reactivar más adelante si es necesario.'"
+  confirmLabel="Sí, eliminar"
+  (close)="deleteUserOpen = false"
+  (confirm)="confirmDeleteUser()"
+>
+  @if (deleteUserError) {
+    <p class="mt-3 text-sm text-error-500">{{ deleteUserError }}</p>
+  }
+</app-dasi-confirm-modal>

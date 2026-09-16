@@ -1,14 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
 import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-item.component';
-import { CountryMapComponent } from '../country-map/country-map.component';
 
 @Component({
   selector: 'app-demographic-card',
   imports: [
-    CommonModule,
-    CountryMapComponent,
     DropdownComponent,
     DropdownItemComponent,
   ],
@@ -25,20 +21,26 @@ export class DemographicCardComponent {
     this.isOpen = false;
   }
 
-  countries = [
+  projectStatuses = [
     {
-      img: '/images/country/country-01.svg',
-      alt: 'usa',
-      name: 'USA',
-      customers: '2,379 Customers',
-      percent: 79,
+      name: 'En ejecución',
+      projects: '8 proyectos',
+      percent: 44,
     },
     {
-      img: '/images/country/country-02.svg',
-      alt: 'france',
-      name: 'France',
-      customers: '589 Customers',
-      percent: 23,
+      name: 'En planificación',
+      projects: '5 proyectos',
+      percent: 28,
+    },
+    {
+      name: 'En riesgo',
+      projects: '3 proyectos',
+      percent: 17,
+    },
+    {
+      name: 'Finalizados',
+      projects: '2 proyectos',
+      percent: 11,
     },
   ];
 }

@@ -21,7 +21,7 @@ import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-
   templateUrl: './monthly-target.component.html',
 })
 export class MonthlyTargetComponent {
-  public series: ApexNonAxisChartSeries = [75.55];
+  public series: ApexNonAxisChartSeries = [68];
   public chart: ApexChart = {
     fontFamily: 'Outfit, sans-serif',
     type: 'radialBar',
@@ -57,7 +57,7 @@ export class MonthlyTargetComponent {
   public stroke: ApexStroke = {
     lineCap: 'round',
   };
-  public labels: string[] = ['Progress'];
+  public labels: string[] = ['Avance'];
   public colors: string[] = ['#465FFF'];
 
   isOpen = false;

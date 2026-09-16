@@ -3,10 +3,10 @@
     <div class="flex justify-between">
       <div>
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Monthly Target
+          Avance institucional
         </h3>
         <p class="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-          Target you’ve set for each month
+          Cumplimiento visual del periodo actual
         </p>
       </div>
       <div class="relative inline-block">
@@ -16,11 +16,11 @@
         <app-dropdown [isOpen]="isOpen" (close)="closeDropdown()" className="w-40 p-2">
           <app-dropdown-item (itemClick)="closeDropdown()"
             className="flex w-full font-normal ltr:text-left rtl:text-right text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
-            View More
+          Ver detalle
           </app-dropdown-item>
           <app-dropdown-item (itemClick)="closeDropdown()"
             className="flex w-full font-normal ltr:text-left rtl:text-right text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
-            Delete
+          Exportar
           </app-dropdown-item>
         </app-dropdown>
       </div>
@@ -38,39 +38,39 @@
         ></apx-chart>
       </div>
       <span class="absolute left-1/2 top-[85%] -translate-x-1/2 -translate-y-[85%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
-        +10%
+        Meta visual: 75%
       </span>
     </div>
     <p class="mx-auto mt-1.5 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-      You earn $3287 today, it's higher than last month. Keep up your good work!
+      El avance institucional registra 68% de cumplimiento durante el periodo actual.
     </p>
   </div>
 
   <div class="flex items-center justify-center gap-5 px-6 py-3.5 sm:gap-8 sm:py-5">
     <div>
       <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-        Target
+        Meta
       </p>
       <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-        $20K
+        75%
       </p>
     </div>
     <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
     <div>
       <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-        Revenue
+        Avance
       </p>
       <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-        $20K
+        68%
       </p>
     </div>
     <div class="w-px bg-gray-200 h-7 dark:bg-gray-800"></div>
     <div>
       <p class="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-        Today
+        Completadas
       </p>
       <p class="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-        $20K
+        126
       </p>
     </div>
   </div>

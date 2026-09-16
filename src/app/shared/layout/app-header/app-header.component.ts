@@ -1,10 +1,11 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { SidebarService } from '../../services/sidebar.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeToggleButtonComponent } from '../../components/common/theme-toggle/theme-toggle-button.component';
 import { NotificationDropdownComponent } from '../../components/header/notification-dropdown/notification-dropdown.component';
 import { UserDropdownComponent } from '../../components/header/user-dropdown/user-dropdown.component';
+import { SessionService } from '../../../core/services/session.service';
 
 @Component({
   selector: 'app-header',
@@ -20,6 +21,7 @@ import { UserDropdownComponent } from '../../components/header/user-dropdown/use
 export class AppHeaderComponent {
   isApplicationMenuOpen = false;
   readonly isMobileOpen$;
+  readonly session = inject(SessionService);
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 

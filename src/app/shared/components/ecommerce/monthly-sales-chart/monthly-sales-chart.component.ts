@@ -17,8 +17,8 @@ import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-
 export class MonthlySalesChartComponent {
   public series: ApexAxisChartSeries = [
     {
-      name: 'Sales',
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      name: 'Actividades completadas',
+      data: [8, 11, 14, 12, 17, 19, 15, 21, 18, 24, 20, 27],
     },
   ];
   public chart: ApexChart = {
@@ -60,7 +60,7 @@ export class MonthlySalesChartComponent {
   public fill: ApexFill = { opacity: 1 };
   public tooltip: ApexTooltip = {
     x: { show: false },
-    y: { formatter: (val: number) => `${val}` },
+    y: { formatter: (val: number) => `${val} actividades` },
   };
   public colors: string[] = ['#465fff'];
 

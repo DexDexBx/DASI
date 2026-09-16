@@ -1,0 +1,271 @@
+<app-dasi-module-header title="Tablero de proyectos" description="Kanban de DASI: gestiona el estado de los proyectos a lo largo del flujo institucional." />
+
+<div class="space-y-4">
+  <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total de proyectos</p>
+      <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ total }}</p>
+      <span class="mt-1 inline-flex items-center gap-1.5 text-xs text-gray-400">con los filtros aplicados</span>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-gray-400"></span>
+        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendientes</p>
+      </div>
+      <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ pendingCount }}</p>
+      <span class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        en espera o por iniciar
+      </span>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">En ejecución</p>
+      </div>
+      <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ inProgressCount }}</p>
+      <span class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <svg class="h-3.5 w-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        implementados sin cerrar
+      </span>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
+        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">En revisión</p>
+      </div>
+      <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ reviewCount }}</p>
+      <span class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <svg class="h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        requieren validación
+      </span>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Completados</p>
+      </div>
+      <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white/90">{{ completedCount }}</p>
+      <span class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        revisados y cerrados
+      </span>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="relative w-full lg:w-72">
+        <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input [(ngModel)]="search" type="text" placeholder="Buscar por proyecto, código, responsable o dependencia…" class="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-300 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <select [(ngModel)]="filterResponsable" class="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+          <option value="">Responsable: todos</option>
+          @for (name of responsables; track name) {
+            <option [value]="name">{{ name }}</option>
+          }
+        </select>
+        <select [(ngModel)]="filterPrioridad" class="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+          <option value="">Prioridad: todas</option>
+          @for (p of prioridades; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+        <select [(ngModel)]="filterEstado" class="h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+          <option value="">Estado: todos</option>
+          @for (col of columns; track col.status) {
+            <option [value]="col.status">{{ col.label }}</option>
+          }
+        </select>
+        @if (search || filterResponsable || filterPrioridad || filterEstado) {
+          <button (click)="clearFilters()" class="inline-flex h-10 items-center gap-1.5 rounded-lg border border-gray-200 px-3 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            Limpiar
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-4 overflow-x-auto pb-4 lg:pb-2">
+    @for (col of columns; track col.status) {
+      <section
+        class="flex w-[300px] shrink-0 flex-col rounded-2xl border border-gray-200 bg-gray-50/80 transition-all dark:border-gray-800 dark:bg-white/[0.03]"
+        [class.ring-2]="dragOverStatus === col.status"
+        [class.ring-brand-500]="dragOverStatus === col.status && esDropLegal(col.status)"
+        [class.ring-rose-500]="dragOverStatus === col.status && !esDropLegal(col.status)"
+        (dragover)="allowDrop($event)"
+        (dragenter)="onDragEnter(col.status)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop(col.status, $event)"
+      >
+        <div class="border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full {{ col.dotColor }}"></span>
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-800 dark:text-white/90">{{ col.label }}</h2>
+            <span class="ml-auto rounded-full px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300 {{ col.headerBg }}">{{ cards(col.status).length }}</span>
+          </div>
+          @if (dragOverStatus === col.status) {
+            <p class="mt-1.5 pl-4 text-xs font-medium {{ esDropLegal(col.status) ? 'text-brand-500' : 'text-rose-500' }}">
+              {{ esDropLegal(col.status) ? 'Suelta la tarjeta para mover aquí' : 'Movimiento no permitido en este estado' }}
+            </p>
+          } @else {
+            <p class="mt-1.5 pl-4 text-xs text-gray-500 dark:text-gray-400">{{ col.description }}</p>
+          }
+        </div>
+        <div class="flex flex-1 flex-col space-y-3 p-3">
+          @for (proyecto of cards(col.status); track proyecto.id) {
+            <article
+              class="group relative cursor-grab rounded-xl border border-gray-200 bg-white p-4 shadow-theme-xs transition-all hover:shadow-theme-lg dark:border-gray-800 dark:bg-gray-900 active:cursor-grabbing"
+              draggable="true"
+              (dragstart)="onDragStart(proyecto)"
+              (dragend)="onDragEnd()"
+              [class.opacity-50]="esTarjetaArrastrada(proyecto)"
+              (click)="abrirDetalle(proyecto)"
+            >
+              <div class="flex items-center justify-between">
+                <span class="rounded-md bg-brand-50 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-brand-500 dark:bg-brand-500/15">{{ proyecto.code }}</span>
+                <div class="flex items-center gap-1">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 text-[10px] font-semibold text-brand-500 dark:bg-brand-500/15">{{ initialsOf(proyecto.owner.nombre) }}</span>
+                  <button (click)="open = open === proyecto.id ? '' : proyecto.id; $event.stopPropagation()" class="dropdown-toggle shrink-0 rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" aria-label="Acciones">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 10a2 2 0 100 4 2 2 0 000-4zM12 4a2 2 0 100 4 2 2 0 000-4zM12 16a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                  </button>
+                  <app-dropdown [isOpen]="open === proyecto.id" (close)="open = ''" className="absolute z-50 right-0 top-9 w-56 rounded-xl border border-gray-200 bg-white p-1 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+                    <app-dropdown-item (itemClick)="abrirDetalle(proyecto)" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">Ver detalle</app-dropdown-item>
+                    @if (nextTransiciones(proyecto.estado).some((t) => puedeCambiar(proyecto, t.estado))) {
+                      <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+                      <p class="px-3 py-1 text-xs font-medium text-gray-400">Cambiar estado</p>
+                      @for (t of nextTransiciones(proyecto.estado); track t.estado) {
+                        @if (puedeCambiar(proyecto, t.estado)) {
+                          <app-dropdown-item (itemClick)="cambiar(proyecto, t.estado)" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">→ {{ statusLabel(t.estado) }}</app-dropdown-item>
+                        }
+                      }
+                    }
+                  </app-dropdown>
+                </div>
+              </div>
+              <h3 class="mt-2 text-sm font-semibold leading-snug text-gray-800 dark:text-white/90">{{ proyecto.nombre }}</h3>
+              <p class="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                {{ proyecto.dependencia.nombre }}
+                <app-badge size="sm" [color]="projectBadge(proyecto.estado)">{{ statusLabel(proyecto.estado) }}</app-badge>
+              </p>
+              <div class="mt-3 flex items-center justify-between">
+                <span class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  {{ proyecto.owner.nombre }}
+                </span>
+                <app-badge size="sm" [color]="priorityBadge(proyecto.prioridad)">{{ proyecto.prioridad }}</app-badge>
+              </div>
+              <div class="mt-3">
+                <div class="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                  <span>Avance</span>
+                  <span class="font-semibold text-gray-700 dark:text-gray-300">{{ proyecto.progreso }}%</span>
+                </div>
+                <div class="mt-1 h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-800">
+                  <div class="h-full rounded-full bg-brand-500" [style.width.%]="proyecto.progreso"></div>
+                </div>
+              </div>
+              <div class="mt-3 flex items-center justify-between text-[11px]">
+                <span class="inline-flex items-center gap-1 font-medium text-gray-500 dark:text-gray-400">
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  {{ fmt(proyecto.fecha_fin_estimada) }}
+                </span>
+                <span class="inline-flex items-center gap-1 font-medium text-gray-500 dark:text-gray-400">
+                  {{ proyecto._count.actividades }} activ.
+                </span>
+              </div>
+            </article>
+          } @empty {
+            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 p-6 text-center dark:border-gray-800">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Sin proyectos</p>
+              <p class="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">Arrastra una tarjeta aquí o abre el detalle</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (moverOpen) {
+    <app-modal [isOpen]="moverOpen" (close)="cerrarMover()" className="max-w-[520px] p-6 sm:p-8" [showCloseButton]="false">
+      <div class="flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white/90">
+              @if (moverPermitido) {
+                Mover a “{{ moverTarget ? statusLabel(moverTarget) : '' }}”
+              } @else {
+                Movimiento no permitido
+              }
+            </h3>
+            @if (moverProyecto) {
+              <p class="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                {{ moverProyecto.code }} · {{ moverProyecto.nombre }}
+              </p>
+            }
+          </div>
+          <button (click)="cerrarMover()" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200" aria-label="Cerrar">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        @if (moverProyecto && moverTarget) {
+          <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+            Se moverá de
+            <span class="font-semibold text-gray-800 dark:text-white/90">“{{ statusLabel(moverProyecto.estado) }}”</span>
+            a
+            <span class="font-semibold text-gray-800 dark:text-white/90">“{{ statusLabel(moverTarget) }}”</span>.
+          </p>
+        }
+
+        @if (moverPermitido) {
+          <div class="mt-4 flex items-start gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div>
+              <p class="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                La acción “{{ moverAccion }}” está disponible
+              </p>
+              <p class="mt-1 text-xs text-brand-600/80 dark:text-brand-300/80">
+                Confirma el cambio para registrar el movimiento en el historial del proyecto.
+              </p>
+            </div>
+          </div>
+        } @else {
+          <div class="mt-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-500/20 dark:bg-rose-500/10">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <div>
+              <p class="text-sm font-semibold text-rose-600 dark:text-rose-400">No se puede realizar este movimiento</p>
+              <p class="mt-1 text-xs text-rose-600/80 dark:text-rose-300/80">{{ moverMotivo }}</p>
+            </div>
+          </div>
+        }
+
+        @if (moverError) {
+          <div class="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-medium text-rose-600 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
+            {{ moverError }}
+          </div>
+        }
+
+        <div class="mt-6 flex justify-end gap-3">
+          @if (moverPermitido) {
+            <button (click)="cerrarMover()" class="inline-flex h-10 items-center rounded-lg border border-gray-200 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+              Cancelar
+            </button>
+            <button
+              (click)="confirmarMover()"
+              [disabled]="moverProcesando"
+              class="inline-flex h-10 items-center rounded-lg bg-brand-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              @if (moverProcesando) { Moviendo… } @else { Confirmar cambio }
+            </button>
+          } @else {
+            <button (click)="cerrarMover()" class="inline-flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+              Entendido
+            </button>
+          }
+        </div>
+      </div>
+    </app-modal>
+  }
+</div>

@@ -1,0 +1,12 @@
+<app-modal [isOpen]="isOpen" (close)="close.emit()" className="max-w-[560px] p-6 sm:p-8">
+  <h3 class="pr-10 text-xl font-semibold text-gray-800 dark:text-white/90">{{ title }}</h3>
+  <div class="mt-6 space-y-4">
+    @for (item of items; track item.label) {
+      <div class="flex flex-col gap-1 border-b border-gray-100 pb-3 last:border-0 dark:border-gray-800 sm:flex-row sm:justify-between">
+        <span class="text-sm text-gray-500 dark:text-gray-400">{{ item.label }}</span>
+        <span class="text-sm font-medium text-gray-800 dark:text-white/90">{{ item.value }}</span>
+      </div>
+    }
+  </div>
+  <div class="mt-7 flex justify-end"><button (click)="close.emit()" class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">Cerrar</button></div>
+</app-modal>

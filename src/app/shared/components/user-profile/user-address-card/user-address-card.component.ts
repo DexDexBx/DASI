@@ -28,10 +28,10 @@ export class UserAddressCardComponent {
   closeAddressModal() { this.isAddressModalOpen = false; }
 
   address = {
-    country: 'United States',
-    cityState: 'Arizona, United States.',
-    postalCode: 'ERT 2489',
-    taxId: 'AS4568384',
+    country: 'Perú',
+    cityState: 'Lima, Perú.',
+    postalCode: '15001',
+    taxId: 'DASI-001',
   };
 
   handleAddressSave() {

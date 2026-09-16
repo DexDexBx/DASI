@@ -1,95 +1,32 @@
-// import { CommonModule } from '@angular/common';
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-recent-orders',
-//   imports: [CommonModule],
-//   templateUrl: './recent-orders.component.html',
-//   styleUrl: './recent-orders.component.css'
-// })
-// export class RecentOrdersComponent {
-
-// }
-
-
-
 import { Component } from '@angular/core';
-// import { TableComponent } from '../../ui/table/table.component';
-// import { TableBodyComponent } from '../../ui/table/table-body.component';
-// import { TableCellComponent } from '../../ui/table/table-cell.component';
-// import { TableHeaderComponent } from '../../ui/table/table-header.component';
-// import { TableRowComponent } from '../../ui/table/table-row.component';
 import { BadgeComponent } from '../../ui/badge/badge.component';
 
-interface Product {
+interface Activity {
   id: number;
-  name: string;
-  variants: string;
-  category: string;
-  price: string;
-  image: string;
-  status: 'Delivered' | 'Pending' | 'Canceled';
+  activity: string;
+  project: string;
+  responsible: string;
+  dueDate: string;
+  status: 'Pendiente' | 'En curso' | 'Vencida' | 'Completada';
 }
 
 @Component({
   selector: 'app-recent-orders',
-  imports: [
-    BadgeComponent
-],
+  imports: [BadgeComponent],
   templateUrl: './recent-orders.component.html'
 })
 export class RecentOrdersComponent {
-  tableData: Product[] = [
-    {
-      id: 1,
-      name: "MacBook Pro 13”",
-      variants: "2 Variants",
-      category: "Laptop",
-      price: "$2399.00",
-      status: "Delivered",
-      image: "/images/product/product-01.jpg",
-    },
-    {
-      id: 2,
-      name: "Apple Watch Ultra",
-      variants: "1 Variant",
-      category: "Watch",
-      price: "$879.00",
-      status: "Pending",
-      image: "/images/product/product-02.jpg",
-    },
-    {
-      id: 3,
-      name: "iPhone 15 Pro Max",
-      variants: "2 Variants",
-      category: "SmartPhone",
-      price: "$1869.00",
-      status: "Delivered",
-      image: "/images/product/product-03.jpg",
-    },
-    {
-      id: 4,
-      name: "iPad Pro 3rd Gen",
-      variants: "2 Variants",
-      category: "Electronics",
-      price: "$1699.00",
-      status: "Canceled",
-      image: "/images/product/product-04.jpg",
-    },
-    {
-      id: 5,
-      name: "AirPods Pro 2nd Gen",
-      variants: "1 Variant",
-      category: "Accessories",
-      price: "$240.00",
-      status: "Delivered",
-      image: "/images/product/product-05.jpg",
-    },
+  tableData: Activity[] = [
+    { id: 1, activity: 'Validar informe de avance', project: 'Modernización institucional', responsible: 'María Torres', dueDate: '10 Sep 2026', status: 'Pendiente' },
+    { id: 2, activity: 'Registrar evidencia fotográfica', project: 'Mejora de infraestructura', responsible: 'Carlos Rojas', dueDate: '11 Sep 2026', status: 'En curso' },
+    { id: 3, activity: 'Actualizar matriz de riesgos', project: 'Gestión de calidad', responsible: 'Lucía Mendoza', dueDate: '08 Sep 2026', status: 'Vencida' },
+    { id: 4, activity: 'Revisar observaciones registradas', project: 'Fortalecimiento académico', responsible: 'Jorge Salazar', dueDate: '13 Sep 2026', status: 'Pendiente' },
+    { id: 5, activity: 'Consolidar reporte mensual', project: 'Seguimiento institucional', responsible: 'Andrea Castro', dueDate: '06 Sep 2026', status: 'Completada' },
   ];
 
-  getBadgeColor(status: string): 'success' | 'warning' | 'error' {
-    if (status === 'Delivered') return 'success';
-    if (status === 'Pending') return 'warning';
+  getBadgeColor(status: Activity['status']): 'success' | 'warning' | 'error' {
+    if (status === 'Completada') return 'success';
+    if (status === 'Pendiente' || status === 'En curso') return 'warning';
     return 'error';
   }
 }

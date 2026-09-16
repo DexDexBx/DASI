@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ThemeService } from './shared/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -12,8 +13,10 @@ import { RouterModule } from '@angular/router';
 })
 export class AppComponent implements OnInit {
   title = 'Angular Ecommerce Dashboard | TailAdmin';
+  private readonly theme = inject(ThemeService);
 
   ngOnInit(): void {
+    this.theme.setTheme(this.theme.current);
     const savedDir = localStorage.getItem('dir');
     if (savedDir === 'rtl') {
       document.documentElement.setAttribute('dir', 'rtl');
