@@ -14,31 +14,31 @@
   (mouseenter)="onSidebarMouseEnter()"
   (mouseleave)="sidebarService.setHovered(false)"
 >
-  <div
-    class="py-8 flex"
-    [ngClass]="{
-      'xl:justify-center': !((isExpanded$ | async) || (isHovered$ | async)),
-      'justify-start': (isExpanded$ | async) || (isHovered$ | async)
-    }"
-  >
+  <div class="py-8 flex justify-center">
     <a routerLink="/">
       @if ((isExpanded$ | async) || (isHovered$ | async) || (isMobileOpen$ | async)) {
       <img
         class="dark:hidden"
-        src="/images/logo/logo.svg"
+        src="/images/logo/Logo01.png"
         alt="Logo"
         width="150"
-        height="40"
+        height="47"
       />
       <img
         class="hidden dark:block"
-        src="/images/logo/logo-dark.svg"
+        src="/images/logo/Logo02.png"
         alt="Logo"
         width="150"
-        height="40"
+        height="47"
       />
       } @else {
-      <img src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+      <img
+        src="/images/logo/logo-icon.png"
+        alt="Logo"
+        width="32"
+        height="32"
+        class="rounded-lg bg-[#910048] p-1"
+      />
       }
     </a>
   </div>
