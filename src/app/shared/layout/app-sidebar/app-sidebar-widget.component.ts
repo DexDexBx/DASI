@@ -11,9 +11,13 @@ import { SessionService } from '../../../core/services/session.service';
     >
       @if (session.isLoggedIn) {
         <div
-          class="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-brand-500 text-sm font-semibold text-white shadow-sm"
+          class="mx-auto mb-3 flex size-12 items-center justify-center overflow-hidden rounded-full bg-brand-500 text-sm font-semibold text-white shadow-sm"
         >
-          {{ initials }}
+          @if (user?.avatar_url) {
+            <img [src]="user?.avatar_url" referrerpolicy="no-referrer" [alt]="user?.nombre" class="size-full object-cover" />
+          } @else {
+            {{ initials }}
+          }
         </div>
         <h3
           class="truncate text-theme-sm font-semibold text-gray-900 dark:text-white"
@@ -24,6 +28,12 @@ import { SessionService } from '../../../core/services/session.service';
           class="mt-0.5 truncate text-theme-xs font-medium text-brand-500 dark:text-brand-400"
         >
           {{ rolLabel }}
+        </p>
+        <p class="mt-1 truncate text-theme-xs text-gray-500 dark:text-gray-400">
+          {{ session.sesion?.cargo?.nombre ?? 'Sin cargo' }}
+        </p>
+        <p class="truncate text-theme-xs text-gray-500 dark:text-gray-400">
+          {{ session.sesion?.dependencia?.nombre ?? 'Sin dependencia' }}
         </p>
         <a
           routerLink="/profile"

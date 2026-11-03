@@ -5,6 +5,7 @@ import { UpdateObservacionDto } from './dto/update-observacion.dto.js';
 import { QueryObservacionesDto } from './dto/query-observaciones.dto.js';
 import { CambioEstadoObservacionDto } from './dto/cambio-estado-observacion.dto.js';
 import { Prisma } from '@prisma/client';
+import { buildAlcanceObservaciones } from '../../common/auth/alcance.js';
 
 const USER = {
   id: true,
@@ -35,6 +36,7 @@ export class ObservacionesService {
 
   async findAll(
     query: QueryObservacionesDto,
+    usuarioAutenticadoId: string,
   ): Promise<{ data: ObservacionPayload[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
     const { page = 1, limit = 20, search, evidencia_id, actividad_id, proyecto_id, usuario_id, estado, solo_raiz } = query;
     const skip = (page - 1) * limit;
@@ -57,6 +59,9 @@ export class ObservacionesService {
     if (estado) where.estado = estado as Prisma.ObservacionWhereInput['estado'];
     if (solo_raiz === 'true') where.parent_id = null;
 
+    const alcance = await buildAlcanceObservaciones(this.prisma, usuarioAutenticadoId);
+    if (alcance) where.AND = [alcance];
+
     const [data, total] = await Promise.all([
       this.prisma.observacion.findMany({
         where,
@@ -74,13 +79,18 @@ export class ObservacionesService {
     };
   }
 
-  async findOne(id: string): Promise<ObservacionPayload> {
-    const observacion = await this.prisma.observacion.findUnique({
-      where: { id },
+  async findOne(id: string, usuarioAutenticadoId: string): Promise<ObservacionPayload> {
+    const alcance = await buildAlcanceObservaciones(this.prisma, usuarioAutenticadoId);
+    const observacion = await this.prisma.observacion.findFirst({
+      where: {
+        id,
+        deleted_at: null,
+        ...(alcance ? { AND: [alcance] } : {}),
+      },
       include: INCLUDE,
     });
 
-    if (!observacion || observacion.deleted_at) {
+    if (!observacion) {
       throw new NotFoundException(`Observación con id ${id} no encontrada`);
     }
 
@@ -144,8 +154,8 @@ export class ObservacionesService {
     return observacion;
   }
 
-  async update(id: string, dto: UpdateObservacionDto): Promise<ObservacionPayload> {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateObservacionDto, usuarioAutenticadoId: string): Promise<ObservacionPayload> {
+    await this.findOne(id, usuarioAutenticadoId);
 
     return this.prisma.observacion.update({
       where: { id },
@@ -154,8 +164,8 @@ export class ObservacionesService {
     });
   }
 
-  async cambiarEstado(id: string, dto: CambioEstadoObservacionDto): Promise<ObservacionPayload> {
-    await this.findOne(id);
+  async cambiarEstado(id: string, dto: CambioEstadoObservacionDto, usuarioAutenticadoId: string): Promise<ObservacionPayload> {
+    await this.findOne(id, usuarioAutenticadoId);
 
     return this.prisma.observacion.update({
       where: { id },
@@ -164,8 +174,8 @@ export class ObservacionesService {
     });
   }
 
-  async remove(id: string): Promise<{ message: string }> {
-    await this.findOne(id);
+  async remove(id: string, usuarioAutenticadoId: string): Promise<{ message: string }> {
+    await this.findOne(id, usuarioAutenticadoId);
 
     await this.prisma.observacion.update({
       where: { id },

@@ -7,7 +7,12 @@ import { ApiClient } from './api.service';
 export class AuthApiService {
   constructor(private readonly api: ApiClient) {}
 
-  login(account: string): Observable<Sesion> {
-    return this.api.post<Sesion>('/auth/login', { account });
+  /** Registra el inicio de sesión (el backend valida el Firebase ID Token). */
+  iniciarSesion(): Observable<Sesion> {
+    return this.api.post<Sesion>('/auth/session', {});
+  }
+
+  me(): Observable<Sesion> {
+    return this.api.get<Sesion>('/auth/me');
   }
 }

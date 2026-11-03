@@ -58,8 +58,8 @@ interface AlertView {
 })
 export class DasiDashboardComponent implements OnInit, OnDestroy {
   series: ApexAxisChartSeries = [
-    { name: 'Planificadas', data: [10, 13, 16, 15, 19, 20, 17, 23, 20, 26, 22, 28] },
-    { name: 'Completadas', data: [8, 11, 14, 12, 17, 19, 15, 21, 18, 24, 20, 27] },
+    { name: 'Planificadas', data: new Array(12).fill(0) as number[] },
+    { name: 'Completadas', data: new Array(12).fill(0) as number[] },
   ];
   chart: ApexChart = { type: 'bar', height: 300, toolbar: { show: false }, fontFamily: 'Outfit, sans-serif' };
   xaxis: ApexXAxis = { categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] };
@@ -87,7 +87,8 @@ export class DasiDashboardComponent implements OnInit, OnDestroy {
   stats: StatsDashboard | null = null;
   loading = true;
   loadError = '';
-  accessDenied = '';
+  /** Secciones que no pudieron cargarse (sin permiso, sesión, conexión). El resto sí se muestra. */
+  avisos: string[] = [];
   resumenVencimientos: Vencimiento[] = [];
   summaryDismissed = false;
 
@@ -112,22 +113,38 @@ export class DasiDashboardComponent implements OnInit, OnDestroy {
 
   retry(): void {
     this.loadError = '';
-    this.accessDenied = '';
+    this.avisos = [];
     this.loading = true;
     this.load();
   }
 
-  private proyectosPorScope(scope: 'mis' | 'oficina' | 'colaboro', userId: string): Observable<Proyecto[]> {
-    return fetchAllPages((page, limit) =>
-      this.proyectosApi.findAll({ [scope]: 'true', usuario_id: userId, page, limit }),
-    ).pipe(
+  /** Convierte un error de la API en un mensaje legible para el usuario. */
+  private mensajeError(seccion: string, err: unknown): string {
+    if (err instanceof ApiError) {
+      if (err.status === 0) return `${seccion}: no se pudo conectar con el servidor.`;
+      if (err.status === 401) return `${seccion}: la sesión ya no es válida. Vuelva a iniciar sesión.`;
+      if (err.status === 403) return `${seccion}: no tiene permiso para ver esta información.`;
+      return `${seccion}: ${err.message}`;
+    }
+    return `${seccion}: error inesperado.`;
+  }
+
+  /** Cada fuente de datos se carga de forma independiente: un fallo no oculta el resto. */
+  private seguro<T>(obs: Observable<T>, fallback: T, seccion: string, errores: string[]): Observable<T> {
+    return obs.pipe(
       catchError((err: unknown) => {
-        if (err instanceof ApiError && err.status === 403) {
-          this.accessDenied =
-            'No tienes permiso para ver los proyectos de tu oficina. Solicita el permiso correspondiente al administrador.';
-        }
-        return of([] as Proyecto[]);
+        errores.push(this.mensajeError(seccion, err));
+        return of(fallback);
       }),
+    );
+  }
+
+  private proyectosPorScope(scope: 'mis' | 'oficina' | 'colaboro', userId: string, errores: string[]): Observable<Proyecto[]> {
+    return this.seguro(
+      fetchAllPages((page, limit) => this.proyectosApi.findAll({ [scope]: 'true', usuario_id: userId, page, limit })),
+      [] as Proyecto[],
+      'Proyectos',
+      errores,
     );
   }
 
@@ -135,34 +152,56 @@ export class DasiDashboardComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
     const userId = this.session.sesion?.user.id;
     const esGlobal = this.session.sesion?.roles.some((r) => r.scope === 'GLOBAL') ?? false;
+    const errores: string[] = [];
+
+    const proyectos$: Observable<Proyecto[]> = esGlobal
+      ? this.seguro(
+          fetchAllPages((page, limit) => this.proyectosApi.findAll({ usuario_id: userId, page, limit })),
+          [] as Proyecto[],
+          'Proyectos',
+          errores,
+        )
+      : forkJoin({
+          mis: userId ? this.proyectosPorScope('mis', userId, errores) : of([] as Proyecto[]),
+          oficina: userId ? this.proyectosPorScope('oficina', userId, errores) : of([] as Proyecto[]),
+          colaboro: userId ? this.proyectosPorScope('colaboro', userId, errores) : of([] as Proyecto[]),
+        }).pipe(
+          map(({ mis, oficina, colaboro }) => {
+            const mapa = new Map<string, Proyecto>();
+            for (const p of [...mis, ...oficina, ...colaboro]) {
+              mapa.set(p.id, p);
+            }
+            return [...mapa.values()];
+          }),
+        );
 
     this.sub = forkJoin({
-      stats: this.statsApi.resumen(userId),
-      proyectos: esGlobal
-        ? fetchAllPages((page, limit) => this.proyectosApi.findAll({ usuario_id: userId, page, limit }))
-        : forkJoin({
-            mis: userId
-              ? this.proyectosPorScope('mis', userId)
-              : of([] as Proyecto[]),
-            oficina: userId
-              ? this.proyectosPorScope('oficina', userId)
-              : of([] as Proyecto[]),
-            colaboro: userId
-              ? this.proyectosPorScope('colaboro', userId)
-              : of([] as Proyecto[]),
-          }).pipe(
-            map(({ mis, oficina, colaboro }) => {
-              const mapa = new Map<string, Proyecto>();
-              for (const p of [...mis, ...oficina, ...colaboro]) {
-                mapa.set(p.id, p);
-              }
-              return [...mapa.values()];
-            }),
-          ),
-      actividades: fetchAllPages((page, limit) => this.actividadesApi.findAll({ page, limit, usuario_id: userId })),
-      evidencias: fetchAllPages((page, limit) => this.evidenciasApi.findAll({ page, limit })),
-      observaciones: fetchAllPages((page, limit) => this.observacionesApi.findAll({ page, limit })),
-      auditoria: this.auditoriaApi.findAll({ limit: 5 }),
+      stats: this.seguro(this.statsApi.resumen(userId), null as StatsDashboard | null, 'Indicadores', errores),
+      proyectos: proyectos$,
+      actividades: this.seguro(
+        fetchAllPages((page, limit) => this.actividadesApi.findAll({ page, limit, usuario_id: userId })),
+        [] as Actividad[],
+        'Actividades',
+        errores,
+      ),
+      evidencias: this.seguro(
+        fetchAllPages((page, limit) => this.evidenciasApi.findAll({ page, limit })),
+        [] as Evidencia[],
+        'Evidencias',
+        errores,
+      ),
+      observaciones: this.seguro(
+        fetchAllPages((page, limit) => this.observacionesApi.findAll({ page, limit })),
+        [] as Observacion[],
+        'Observaciones',
+        errores,
+      ),
+      auditoria: this.seguro(
+        this.auditoriaApi.findAll({ limit: 5 }).pipe(map((res) => res.data)),
+        [] as Auditoria[],
+        'Auditoría',
+        errores,
+      ),
     }).subscribe({
       next: (res) => {
         this.stats = res.stats;
@@ -170,7 +209,7 @@ export class DasiDashboardComponent implements OnInit, OnDestroy {
         this.actividades = res.actividades;
         this.evidencias = res.evidencias;
         this.observaciones = res.observaciones;
-        this.auditoria = res.auditoria.data;
+        this.auditoria = res.auditoria;
         if (!esGlobal) {
           this.aplicarAlcance(userId);
         }
@@ -179,18 +218,15 @@ export class DasiDashboardComponent implements OnInit, OnDestroy {
           this.resumenVencimientos.length === 0 ||
           sessionStorage.getItem(`dasi_venc_summary_${this.session.sesion?.user.id ?? 'anon'}`) === '1';
         this.computeSeries(this.actividades);
+        // Si todas las fuentes fallaron, el problema es de conexión o de sesión.
+        this.loadError = errores.length >= 6 ? 'No hay respuesta del servidor DASI. Verifique que la API esté en ejecución.' : '';
+        this.avisos = errores;
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
-        this.loadError =
-          'No se pudieron cargar los indicadores. Verifique que el backend esté disponible en http://localhost:3000/api.';
-        this.proyectos = [];
-        this.actividades = [];
-        this.evidencias = [];
-        this.observaciones = [];
-        this.auditoria = [];
+        this.loadError = 'No se pudieron cargar los indicadores.';
         this.cdr.detectChanges();
       },
     });

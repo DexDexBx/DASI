@@ -1,0 +1,1068 @@
+{
+  "generado": "2026-11-03T20:46:55.135Z",
+  "nota": "Datos iniciales de DASI para un despliegue nuevo. No contiene contraseñas ni firebase_uid: cada usuario se vincula a su cuenta de Google en el primer inicio de sesión por correo.",
+  "modulos": [
+    {
+      "slug": "actividades",
+      "nombre": "Actividades",
+      "descripcion": "Módulo Actividades",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "CambiarEstado",
+        "Eliminar",
+        "Asignar"
+      ]
+    },
+    {
+      "slug": "administracion",
+      "nombre": "Panel de administración",
+      "descripcion": "Módulo Panel de administración",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "auditoria",
+      "nombre": "Auditoría",
+      "descripcion": "Módulo Auditoría",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Exportar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "calendar",
+      "nombre": "Calendario",
+      "descripcion": "Módulo Calendario",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "cargos",
+      "nombre": "Cargos",
+      "descripcion": "Módulo Cargos",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Eliminar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "configuracion",
+      "nombre": "Configuración",
+      "descripcion": "Módulo Configuración",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Editar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "dashboard",
+      "nombre": "Dashboard",
+      "descripcion": "Módulo Dashboard",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "dependencias",
+      "nombre": "Dependencias",
+      "descripcion": "Módulo Dependencias",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Editar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "evidencias",
+      "nombre": "Evidencias",
+      "descripcion": "Módulo Evidencias",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Eliminar",
+        "Aprobar",
+        "Observar",
+        "Exportar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "indicadores",
+      "nombre": "Indicadores",
+      "descripcion": "Módulo Indicadores",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Exportar"
+      ]
+    },
+    {
+      "slug": "kanban",
+      "nombre": "Kanban",
+      "descripcion": "Módulo Kanban",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "CambiarEstado"
+      ]
+    },
+    {
+      "slug": "mis-proyectos",
+      "nombre": "Mis proyectos",
+      "descripcion": "Módulo Mis proyectos",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "modulos",
+      "nombre": "Módulos",
+      "descripcion": "Módulo Módulos",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Editar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "notificaciones",
+      "nombre": "Notificaciones",
+      "descripcion": "Módulo Notificaciones",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "observaciones",
+      "nombre": "Observaciones",
+      "descripcion": "Módulo Observaciones",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Aprobar",
+        "Observar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "permisos",
+      "nombre": "Permisos",
+      "descripcion": "Módulo Permisos",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "profile",
+      "nombre": "Perfil",
+      "descripcion": "Módulo Perfil",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Editar"
+      ]
+    },
+    {
+      "slug": "proyectos",
+      "nombre": "Proyectos",
+      "descripcion": "Módulo Proyectos",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "CambiarEstado",
+        "Aprobar",
+        "Asignar",
+        "Exportar",
+        "Revisar",
+        "Completar"
+      ]
+    },
+    {
+      "slug": "proyectos-colaboracion",
+      "nombre": "Proyectos donde colaboro",
+      "descripcion": "Módulo Proyectos donde colaboro",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "proyectos-oficina",
+      "nombre": "Proyectos de mi oficina",
+      "descripcion": "Módulo Proyectos de mi oficina",
+      "activo": true,
+      "acciones": [
+        "Ver"
+      ]
+    },
+    {
+      "slug": "reportes",
+      "nombre": "Reportes",
+      "descripcion": "Módulo Reportes",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Exportar"
+      ]
+    },
+    {
+      "slug": "roles",
+      "nombre": "Roles",
+      "descripcion": "Módulo Roles",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "tareas",
+      "nombre": "Tareas",
+      "descripcion": "Módulo Tareas",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "CambiarEstado",
+        "Asignar"
+      ]
+    },
+    {
+      "slug": "usuarios",
+      "nombre": "Usuarios",
+      "descripcion": "Módulo Usuarios",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "Crear",
+        "Editar",
+        "Eliminar",
+        "Administrar"
+      ]
+    },
+    {
+      "slug": "workflow",
+      "nombre": "Workflow",
+      "descripcion": "Módulo Workflow",
+      "activo": true,
+      "acciones": [
+        "Ver",
+        "CambiarEstado",
+        "Aprobar",
+        "Administrar"
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "nombre": "ADMINISTRACION_GENERAL",
+      "descripcion": "Administración General: revisión y aprobación de proyectos.",
+      "scope": "GLOBAL",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Aprobar",
+        "proyectos:CambiarEstado",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Revisar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "ADMINISTRADOR",
+      "descripcion": "Acceso global a todos los módulos y acciones del sistema.",
+      "scope": "GLOBAL",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "administracion:Administrar",
+        "administracion:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "cargos:Administrar",
+        "cargos:Crear",
+        "cargos:Editar",
+        "cargos:Eliminar",
+        "cargos:Ver",
+        "configuracion:Administrar",
+        "configuracion:Editar",
+        "configuracion:Ver",
+        "dashboard:Ver",
+        "dependencias:Administrar",
+        "dependencias:Editar",
+        "dependencias:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "modulos:Administrar",
+        "modulos:Editar",
+        "modulos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "permisos:Administrar",
+        "permisos:Crear",
+        "permisos:Editar",
+        "permisos:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Aprobar",
+        "proyectos:Asignar",
+        "proyectos:CambiarEstado",
+        "proyectos:Completar",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Exportar",
+        "proyectos:Revisar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "roles:Administrar",
+        "roles:Crear",
+        "roles:Editar",
+        "roles:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "usuarios:Administrar",
+        "usuarios:Crear",
+        "usuarios:Editar",
+        "usuarios:Eliminar",
+        "usuarios:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "ASISTENTE",
+      "descripcion": "Asistente de oficina: registra y actualiza proyectos y actividades de su oficina.",
+      "scope": "DEPENDENCIA",
+      "permisos": [
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:CambiarEstado",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "COLABORADOR",
+      "descripcion": "Ejecuta y actualiza las actividades que le asignan.",
+      "scope": "PROPIO",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "CONSULTA",
+      "descripcion": "Solo lectura: puede ver y observar la información autorizada.",
+      "scope": "PROPIO",
+      "permisos": [
+        "actividades:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "DEPARTAMENTO_TI",
+      "descripcion": "Departamento de TI: gestor de dependencia y flujo técnico.",
+      "scope": "DEPENDENCIA",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Asignar",
+        "proyectos:CambiarEstado",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "GERENCIA",
+      "descripcion": "Visión global de todos los proyectos de la institución.",
+      "scope": "GLOBAL",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Aprobar",
+        "proyectos:Asignar",
+        "proyectos:CambiarEstado",
+        "proyectos:Completar",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Exportar",
+        "proyectos:Revisar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "JEFE_OFICINA",
+      "descripcion": "Jefe de oficina: gestiona proyectos, actividades y evidencias de su oficina.",
+      "scope": "DEPENDENCIA",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Aprobar",
+        "proyectos:Asignar",
+        "proyectos:CambiarEstado",
+        "proyectos:Completar",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Exportar",
+        "proyectos:Revisar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    },
+    {
+      "nombre": "JGA",
+      "descripcion": "Junta General Administrativa: visión global y supervisión institucional.",
+      "scope": "GLOBAL",
+      "permisos": [
+        "actividades:Asignar",
+        "actividades:CambiarEstado",
+        "actividades:Crear",
+        "actividades:Editar",
+        "actividades:Eliminar",
+        "actividades:Ver",
+        "auditoria:Administrar",
+        "auditoria:Exportar",
+        "auditoria:Ver",
+        "calendar:Ver",
+        "dashboard:Ver",
+        "evidencias:Administrar",
+        "evidencias:Aprobar",
+        "evidencias:Crear",
+        "evidencias:Editar",
+        "evidencias:Eliminar",
+        "evidencias:Exportar",
+        "evidencias:Observar",
+        "evidencias:Ver",
+        "indicadores:Exportar",
+        "indicadores:Ver",
+        "kanban:CambiarEstado",
+        "kanban:Ver",
+        "mis-proyectos:Ver",
+        "notificaciones:Ver",
+        "observaciones:Administrar",
+        "observaciones:Aprobar",
+        "observaciones:Crear",
+        "observaciones:Editar",
+        "observaciones:Observar",
+        "observaciones:Ver",
+        "profile:Editar",
+        "profile:Ver",
+        "proyectos-colaboracion:Ver",
+        "proyectos-oficina:Ver",
+        "proyectos:Aprobar",
+        "proyectos:Asignar",
+        "proyectos:CambiarEstado",
+        "proyectos:Completar",
+        "proyectos:Crear",
+        "proyectos:Editar",
+        "proyectos:Exportar",
+        "proyectos:Revisar",
+        "proyectos:Ver",
+        "reportes:Exportar",
+        "reportes:Ver",
+        "tareas:Asignar",
+        "tareas:CambiarEstado",
+        "tareas:Crear",
+        "tareas:Editar",
+        "tareas:Ver",
+        "workflow:Administrar",
+        "workflow:Aprobar",
+        "workflow:CambiarEstado",
+        "workflow:Ver"
+      ]
+    }
+  ],
+  "dependencias": [
+    {
+      "code": "DEP-ADG",
+      "nombre": "Administración General",
+      "tipo": "Direccion",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-ARA",
+      "nombre": "Asuntos y Registros Académicos",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-BIB",
+      "nombre": "Biblioteca Central",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-CALEDU",
+      "nombre": "Calidad Educativa",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-DEFUNI",
+      "nombre": "Defensoría Universitaria",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-ECOFIN",
+      "nombre": "Economía y Finanzas",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPANI",
+      "nombre": "E.P. Administración y Negocios Internacionales",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPCFB",
+      "nombre": "E.P. Ciencias Farmacéuticas y Bioquímica",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPDER",
+      "nombre": "E.P. Derecho",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPENF",
+      "nombre": "E.P. Enfermería",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPEST",
+      "nombre": "E.P. Estomatología",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPMED",
+      "nombre": "E.P. Medicina",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPOBS",
+      "nombre": "E.P. Obstetricia",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-EPPSI",
+      "nombre": "E.P. Psicología",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-FCED",
+      "nombre": "Facultad de Ciencias Empresariales y Derecho",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-FCS",
+      "nombre": "Facultad de Ciencias de la Salud",
+      "tipo": "Escuela",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-GYT",
+      "nombre": "Grados y Títulos",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-INF",
+      "nombre": "Informes",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-INV",
+      "nombre": "Instituto de investigación",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-LOG",
+      "nombre": "Logística",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-MII",
+      "nombre": "Marketing e Imagen Institucional",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-OBU",
+      "nombre": "Oficina de Bienestar Universitario",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-OPBS",
+      "nombre": "Oficina Producción de Bienes y servicios",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-OTI",
+      "nombre": "Oficina de Tecnologías de la Información",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-POS",
+      "nombre": "Posgrado",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-REC",
+      "nombre": "Rectorado",
+      "tipo": "Direccion",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-SECGEN",
+      "nombre": "Secretaria General",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-TES",
+      "nombre": "Tesorería",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-TH",
+      "nombre": "Talento Humano",
+      "tipo": "Oficina",
+      "director": "Por asignar",
+      "activa": true
+    },
+    {
+      "code": "DEP-VRC",
+      "nombre": "Vicerrectorado",
+      "tipo": "Direccion",
+      "director": "Por asignar",
+      "activa": true
+    }
+  ],
+  "cargos": [
+    {
+      "nombre": "Jefe de Departamento de TI",
+      "descripcion": "Lidera el departamento de tecnología."
+    }
+  ],
+  "usuarios": [
+    {
+      "email": "admin@dasi.com",
+      "nombre": "Super Admin",
+      "account": "admin",
+      "initials": null,
+      "estado": "Activo",
+      "dependencia_code": null,
+      "cargo": null,
+      "roles": [
+        "ADMINISTRADOR"
+      ]
+    },
+    {
+      "email": "cespinal@uroosevelt.edu.pe",
+      "nombre": "C. Espinal",
+      "account": "cespinal",
+      "initials": "CE",
+      "estado": "Activo",
+      "dependencia_code": "DEP-OTI",
+      "cargo": "Jefe de Departamento de TI",
+      "roles": [
+        "ADMINISTRADOR",
+        "DEPARTAMENTO_TI"
+      ]
+    },
+    {
+      "email": "jyalico@uroosevelt.edu.pe",
+      "nombre": "Jhonatan Yalico Meza",
+      "account": "jyalico",
+      "initials": "JY",
+      "estado": "Activo",
+      "dependencia_code": "DEP-GYT",
+      "cargo": null,
+      "roles": [
+        "JEFE_OFICINA"
+      ]
+    },
+    {
+      "email": "soporte@uroosevelt.edu.pe",
+      "nombre": "Soporte DASI",
+      "account": "soporte",
+      "initials": "SD",
+      "estado": "Activo",
+      "dependencia_code": null,
+      "cargo": null,
+      "roles": [
+        "ADMINISTRADOR"
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import { UpdateEvidenciaDto } from './dto/update-evidencia.dto.js';
 import { QueryEvidenciasDto } from './dto/query-evidencias.dto.js';
 import { CambioEstadoEvidenciaDto } from './dto/cambio-estado-evidencia.dto.js';
 import { Prisma } from '@prisma/client';
+import { buildAlcanceEvidencias } from '../../common/auth/alcance.js';
 
 const USER = {
   id: true,
@@ -35,6 +36,7 @@ export class EvidenciasService {
 
   async findAll(
     query: QueryEvidenciasDto,
+    usuarioAutenticadoId: string,
   ): Promise<{ data: EvidenciaPayload[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
     const { page = 1, limit = 20, search, actividad_id, proyecto_id, usuario_id, estado } = query;
     const skip = (page - 1) * limit;
@@ -55,6 +57,9 @@ export class EvidenciasService {
     if (usuario_id) where.usuario_id = usuario_id;
     if (estado) where.estado = estado as Prisma.EvidenciaWhereInput['estado'];
 
+    const alcance = await buildAlcanceEvidencias(this.prisma, usuarioAutenticadoId);
+    if (alcance) where.AND = [alcance];
+
     const [data, total] = await Promise.all([
       this.prisma.evidencia.findMany({
         where,
@@ -72,13 +77,18 @@ export class EvidenciasService {
     };
   }
 
-  async findOne(id: string): Promise<EvidenciaPayload> {
-    const evidencia = await this.prisma.evidencia.findUnique({
-      where: { id },
+  async findOne(id: string, usuarioAutenticadoId: string): Promise<EvidenciaPayload> {
+    const alcance = await buildAlcanceEvidencias(this.prisma, usuarioAutenticadoId);
+    const evidencia = await this.prisma.evidencia.findFirst({
+      where: {
+        id,
+        deleted_at: null,
+        ...(alcance ? { AND: [alcance] } : {}),
+      },
       include: INCLUDE,
     });
 
-    if (!evidencia || evidencia.deleted_at) {
+    if (!evidencia) {
       throw new NotFoundException(`Evidencia con id ${id} no encontrada`);
     }
 
@@ -115,8 +125,8 @@ export class EvidenciasService {
     });
   }
 
-  async update(id: string, dto: UpdateEvidenciaDto): Promise<EvidenciaPayload> {
-    const evidencia = await this.findOne(id);
+  async update(id: string, dto: UpdateEvidenciaDto, usuarioAutenticadoId: string): Promise<EvidenciaPayload> {
+    const evidencia = await this.findOne(id, usuarioAutenticadoId);
 
     if (dto.actividad_id) await this.validateActividad(dto.actividad_id);
     if (dto.proyecto_id) await this.validateProyecto(dto.proyecto_id);
@@ -153,8 +163,8 @@ export class EvidenciasService {
     });
   }
 
-  async cambiarEstado(id: string, dto: CambioEstadoEvidenciaDto): Promise<EvidenciaPayload> {
-    await this.findOne(id);
+  async cambiarEstado(id: string, dto: CambioEstadoEvidenciaDto, usuarioAutenticadoId: string): Promise<EvidenciaPayload> {
+    await this.findOne(id, usuarioAutenticadoId);
 
     return this.prisma.evidencia.update({
       where: { id },
@@ -163,8 +173,8 @@ export class EvidenciasService {
     });
   }
 
-  async remove(id: string): Promise<{ message: string }> {
-    await this.findOne(id);
+  async remove(id: string, usuarioAutenticadoId: string): Promise<{ message: string }> {
+    await this.findOne(id, usuarioAutenticadoId);
 
     await this.prisma.evidencia.update({
       where: { id },

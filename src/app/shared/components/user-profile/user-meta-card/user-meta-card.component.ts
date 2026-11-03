@@ -29,7 +29,7 @@ export class UserMetaCardComponent {
     lastName: '',
     role: '—',
     location: '—',
-    avatar: '/images/user/owner.png',
+    avatar: 'images/user/owner.png',
     social: {
       facebook: 'https://www.facebook.com/',
       x: 'https://x.com/',

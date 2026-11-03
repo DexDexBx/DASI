@@ -182,6 +182,11 @@ model Usuario {
   avatar_url String?
   estado     EstadoUsuario @default(Activo)
 
+  password_hash String?
+  google_sub    String?   @unique
+  firebase_uid  String?   @unique
+  last_login_at DateTime?
+
   dependencia_id String?      @db.Uuid
   dependencia    Dependencia? @relation(fields: [dependencia_id], references: [id], onUpdate: Restrict, onDelete: SetNull)
 

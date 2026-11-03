@@ -10,6 +10,7 @@ import { DerivarProyectoDto } from './dto/derivar-proyecto.dto.js';
 import { ActivarWorkflowDto } from './dto/activar-workflow.dto.js';
 import { AgregarEtapaDto } from './dto/agregar-etapa.dto.js';
 import { Prisma, EstadoProyecto, ScopeRol } from '@prisma/client';
+import { buildAlcanceProyectos } from '../../common/auth/alcance.js';
 
 const USER = {
   id: true,
@@ -112,36 +113,7 @@ export class ProyectosService {
   constructor(private readonly prisma: PrismaService) {}
 
   private async buildRoleScope(usuarioId: string): Promise<Record<string, unknown>> {
-    const usuario = await this.prisma.usuario.findUnique({
-      where: { id: usuarioId },
-      select: {
-        dependencia: { select: { id: true, nombre: true } },
-        usuario_roles: { select: { rol: { select: { scope: true, nombre: true } } } },
-      },
-    });
-    if (!usuario) return {};
-    const scopes = new Set(usuario.usuario_roles.map((ur) => ur.rol.scope));
-    if (scopes.has(ScopeRol.GLOBAL)) return {};
-    const nombreDep = (usuario.dependencia?.nombre ?? '').toLowerCase();
-    const privilegiados = ['junta general administrativa', 'gerencia', 'dirección general de administracion', 'direccion general de administracion'];
-    if (privilegiados.some((k) => nombreDep.includes(k))) return {};
-    if (scopes.has(ScopeRol.DEPENDENCIA) && usuario.dependencia?.id) {
-      return {
-        OR: [
-          { dependencia_id: usuario.dependencia.id },
-          { proyecto_dependencias: { some: { dependencia_id: usuario.dependencia.id } } },
-        ],
-      };
-    }
-    return {
-      OR: [
-        { owner_id: usuarioId },
-        { coordinador_id: usuarioId },
-        { created_by_id: usuarioId },
-        { proyecto_equipo: { some: { usuario_id: usuarioId } } },
-        { actividades: { some: { responsable_id: usuarioId, deleted_at: null } } },
-      ],
-    };
+    return buildAlcanceProyectos(this.prisma, usuarioId);
   }
 
   async findAll(
@@ -199,7 +171,7 @@ export class ProyectosService {
           { proyecto_dependencias: { some: { dependencia_id: dependenciaPropia } } },
         ];
       } else {
-        where.OR = [...(where.OR ?? []), { id: '' }];
+        where.id = { in: [] };
       }
     }
 
@@ -754,7 +726,7 @@ export class ProyectosService {
     }
 
     if (dto.usuario_id && dto.estado) {
-      await this.assertPuedeAvanzarEtapa(proyecto, etapaNormalizada, dto.usuario_id, workflow.responsable_id);
+      await this.assertPuedeAvanzarEtapa(proyecto, dto.usuario_id, workflow.responsable_id);
     }
 
     const data: Prisma.ProyectoWorkflowUpdateInput = {
@@ -809,18 +781,13 @@ export class ProyectosService {
 
   private async assertPuedeAvanzarEtapa(
     proyecto: Prisma.ProyectoGetPayload<{ include: typeof DETAIL_INCLUDE }>,
-    etapa: string,
     usuarioId: string,
     etapaResponsableId?: string | null,
   ): Promise<void> {
-    const responsabilidad = await this.prisma.proyectoResponsabilidad.findFirst({
-      where: { proyecto_id: proyecto.id, etapa: etapa as EstadoProyecto },
-      select: { responsable_id: true },
-      orderBy: { created_at: 'asc' },
-    });
-
-    const esResponsableEtapa =
-      etapaResponsableId === usuarioId || responsabilidad?.responsable_id === usuarioId;
+    // El responsable se toma del workflow de la etapa. No se consulta
+    // ProyectoResponsabilidad porque su columna `etapa` es el enum de estados
+    // del proyecto y no admite nombres de fase como "Planificación".
+    const esResponsableEtapa = etapaResponsableId === usuarioId;
 
     if (
       proyecto.owner_id !== usuarioId &&

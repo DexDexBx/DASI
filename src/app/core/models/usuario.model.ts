@@ -38,6 +38,7 @@ export interface Usuario {
   estado: EstadoUsuario;
   dependencia_id: string | null;
   cargo_id: string | null;
+  last_login_at?: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

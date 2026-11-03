@@ -1,25 +1,30 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthApiService } from './auth-api.service';
 import { ApiError } from './api.service';
+import { FirebaseAuthService } from './firebase-auth.service';
 import { Sesion } from '../models/sesion.model';
 
-const SESSION_STORAGE_KEY = 'dasi_session';
-
+/**
+ * Estado de sesión de DASI. La identidad la gestiona Firebase (Google);
+ * el perfil, roles y permisos se obtienen del backend con el Firebase ID Token.
+ */
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private readonly authApi = inject(AuthApiService);
+  private readonly firebase = inject(FirebaseAuthService);
   private readonly router = inject(Router);
 
   private readonly sesionSubject = new BehaviorSubject<Sesion | null>(null);
+  private readonly readyPromise: Promise<void>;
 
   readonly sesion$: Observable<Sesion | null> = this.sesionSubject.asObservable();
   readonly isLoggedIn$: Observable<boolean> = this.sesion$.pipe(map((s) => s !== null));
 
   constructor() {
-    this.restoreSession();
+    this.readyPromise = this.restoreSession();
   }
 
   get sesion(): Sesion | null {
@@ -30,26 +35,48 @@ export class SessionService {
     return this.sesionSubject.getValue() !== null;
   }
 
-  signIn(account: string): Observable<Sesion> {
-    return this.authApi.login(account).pipe(
-      tap((sesion) => this.setSession(sesion)),
-    );
+  /** Resuelve cuando se conoce si hay una sesión válida al arrancar la app. */
+  ready(): Promise<void> {
+    return this.readyPromise;
+  }
+
+  /**
+   * Inicia sesión con Google. Si el backend rechaza la cuenta (no registrada o
+   * inactiva), cierra la sesión de Firebase y propaga el error.
+   */
+  async signInWithGoogle(): Promise<void> {
+    await this.firebase.signInWithGoogle();
+
+    try {
+      const sesion = await firstValueFrom(this.authApi.iniciarSesion());
+      this.sesionSubject.next(sesion);
+    } catch (err) {
+      await this.firebase.signOut().catch(() => undefined);
+      throw err;
+    }
   }
 
   signOut(): void {
     this.sesionSubject.next(null);
-    localStorage.removeItem(SESSION_STORAGE_KEY);
+    this.firebase
+      .signOut()
+      .catch(() => undefined)
+      .finally(() => this.router.navigate(['/signin']));
   }
 
   can(moduleSlug: string, accion: string): boolean {
     const sesion = this.sesionSubject.getValue();
     if (!sesion) return false;
-    return sesion.permisos.some((p) => p.modulo_slug === moduleSlug && p.accion === accion);
+    if (sesion.roles.some((rol) => rol.nombre === 'ADMINISTRADOR')) return true;
+    return sesion.permisos.some(
+      (p) => p.modulo_slug === moduleSlug && p.accion === accion,
+    );
   }
 
   hasModulo(moduleSlug: string): boolean {
     const sesion = this.sesionSubject.getValue();
     if (!sesion) return false;
+    if (sesion.roles.some((rol) => rol.nombre === 'ADMINISTRADOR')) return true;
     return sesion.modulos.some((m) => m.slug === moduleSlug);
   }
 
@@ -59,36 +86,21 @@ export class SessionService {
     }
   }
 
-  private restoreSession(): void {
-    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
-    if (!raw) return;
+  private async restoreSession(): Promise<void> {
+    const usuarioFirebase = await this.firebase.whenReady().catch(() => null);
+    if (!usuarioFirebase) {
+      this.sesionSubject.next(null);
+      return;
+    }
 
     try {
-      const sesion = JSON.parse(raw) as Sesion;
-      if (!sesion?.user?.account) {
-        throw new Error('Sesión guardada inválida');
-      }
+      const sesion = await firstValueFrom(this.authApi.me());
       this.sesionSubject.next(sesion);
-      this.revalidateSession(sesion.user.account);
-    } catch {
-      localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch (err) {
+      this.sesionSubject.next(null);
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        await this.firebase.signOut().catch(() => undefined);
+      }
     }
-  }
-
-  private setSession(sesion: Sesion): void {
-    this.sesionSubject.next(sesion);
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sesion));
-  }
-
-  private revalidateSession(account: string): void {
-    this.authApi.login(account).subscribe({
-      next: (sesion) => this.setSession(sesion),
-      error: (err: unknown) => {
-        if (err instanceof ApiError && (err.status === 403 || err.status === 404)) {
-          this.signOut();
-          this.router.navigate(['/signin']);
-        }
-      },
-    });
   }
 }

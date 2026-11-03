@@ -31,6 +31,7 @@ export interface Sesion {
     estado: 'Activo' | 'Inactivo';
     dependencia_id: string | null;
     cargo_id: string | null;
+    last_login_at?: string | null;
   };
   dependencia: Dependencia | null;
   cargo: Cargo | null;

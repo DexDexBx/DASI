@@ -1,0 +1,20 @@
+# Ejemplo de bloque para el Caddy central de la Universidad Roosevelt.
+# El catálogo central y Caddy son proyectos independientes de DASI.
+# Integrar solo el bloque /dasi/* en la configuración central existente.
+
+dasi.uroosevelt.edu.pe {
+	encode zstd gzip
+
+	# /dasi -> /dasi/
+	redir /dasi /dasi/ 308
+
+	# Caddy retira /dasi y entrega /, /api/... al Nginx de DASI.
+	handle_path /dasi/* {
+		reverse_proxy dasi-web:80
+	}
+
+	# Catálogo central; ajustar al nombre real del contenedor del catálogo.
+	handle {
+		reverse_proxy catalogo:80
+	}
+}

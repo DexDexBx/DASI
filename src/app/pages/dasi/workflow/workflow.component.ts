@@ -5,6 +5,7 @@ import { BadgeComponent } from '../../../shared/components/ui/badge/badge.compon
 import { ModalComponent } from '../../../shared/components/ui/modal/modal.component';
 import { DasiModuleHeaderComponent } from '../../../shared/components/dasi/module-header/module-header.component';
 import { ProyectosApiService } from '../../../core/services/proyectos-api.service';
+import { ApiError } from '../../../core/services/api.service';
 import { ActividadesApiService } from '../../../core/services/actividades-api.service';
 import { SessionService } from '../../../core/services/session.service';
 import { fetchAllPages } from '../../../core/services/pagination';
@@ -249,10 +250,10 @@ export class WorkflowComponent implements OnInit, OnDestroy {
             .updateWorkflow(proyecto.id, next.etapa, { estado: 'EnCurso', started_at: now, usuario_id: usuarioId })
             .subscribe({
               next: () => this.reloadProyecto(proyecto.id),
-              error: () => this.failAdvance('No se pudo iniciar la siguiente etapa.'),
+              error: (err) => this.failAdvance(this.mensajeError(err, 'No se pudo iniciar la siguiente etapa.')),
             });
         },
-        error: () => this.failAdvance('No se pudo completar la etapa actual.'),
+        error: (err) => this.failAdvance(this.mensajeError(err, 'No se pudo completar la etapa actual.')),
       });
   }
 
@@ -546,6 +547,13 @@ export class WorkflowComponent implements OnInit, OnDestroy {
     this.processing = false;
     this.actionError = message;
     this.cdr.detectChanges();
+  }
+
+  private mensajeError(err: unknown, fallback: string): string {
+    if (err instanceof ApiError) return err.message;
+    const message = (err as { error?: { message?: string | string[] } } | null)?.error?.message;
+    if (Array.isArray(message)) return message.join(', ');
+    return message ?? fallback;
   }
 
   etapaLabel(etapa: string): string {

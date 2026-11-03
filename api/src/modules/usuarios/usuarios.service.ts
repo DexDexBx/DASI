@@ -13,7 +13,16 @@ const INCLUDE = {
   usuario_cargos: true,
 } satisfies Prisma.UsuarioInclude;
 
-type UsuarioPayload = Prisma.UsuarioGetPayload<{ include: typeof INCLUDE }>;
+const OMIT = {
+  password_hash: true,
+  google_sub: true,
+  firebase_uid: true,
+} satisfies Prisma.UsuarioOmit;
+
+type UsuarioPayload = Prisma.UsuarioGetPayload<{
+  include: typeof INCLUDE;
+  omit: typeof OMIT;
+}>;
 
 @Injectable()
 export class UsuariosService {
@@ -47,6 +56,7 @@ export class UsuariosService {
       this.prisma.usuario.findMany({
         where,
         include: INCLUDE,
+        omit: OMIT,
         skip,
         take: limit,
         orderBy: { created_at: 'desc' },
@@ -64,6 +74,7 @@ export class UsuariosService {
     const usuario = await this.prisma.usuario.findUnique({
       where: { id },
       include: INCLUDE,
+      omit: OMIT,
     });
 
     if (!usuario || usuario.deleted_at) {
@@ -103,6 +114,7 @@ export class UsuariosService {
         }),
       },
       include: INCLUDE,
+      omit: OMIT,
     });
   }
 
@@ -150,6 +162,7 @@ export class UsuariosService {
         }),
       },
       include: INCLUDE,
+      omit: OMIT,
     });
   }
 
@@ -173,6 +186,7 @@ export class UsuariosService {
         estado: usuario.estado === 'Activo' ? 'Inactivo' : 'Activo',
       },
       include: INCLUDE,
+      omit: OMIT,
     });
   }
 

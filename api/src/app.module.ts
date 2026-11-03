@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { HealthModule } from './common/health/health.module.js';
 import { UsuariosModule } from './modules/usuarios/usuarios.module.js';
@@ -16,6 +17,8 @@ import { CalendarioModule } from './modules/calendario/calendario.module.js';
 import { AuditoriaModule } from './modules/auditoria/auditoria.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { StatsModule } from './modules/stats/stats.module.js';
+import { FirebaseAuthGuard } from './common/auth/firebase-auth.guard.js';
+import { PermissionsGuard } from './common/auth/permissions.guard.js';
 
 @Module({
   imports: [
@@ -36,6 +39,10 @@ import { StatsModule } from './modules/stats/stats.module.js';
     AuditoriaModule,
     AuthModule,
     StatsModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: FirebaseAuthGuard },
+    { provide: APP_GUARD, useClass: PermissionsGuard },
   ],
 })
 export class AppModule {}

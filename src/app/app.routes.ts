@@ -18,6 +18,7 @@ import { VideosComponent } from './pages/ui-elements/videos/videos.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { AccessDeniedComponent } from './pages/auth-pages/access-denied/access-denied.component';
 import { dasiAuthGuard } from './shared/guards/dasi-auth.guard';
+import { dasiPermissionGuard } from './shared/guards/dasi-permission.guard';
 import { CalenderComponent } from './pages/calender/calender.component';
 import { ListDemoComponent } from './pages/dasi/list-demo/list-demo.component';
 import { KanbanComponent } from './pages/dasi/kanban/kanban.component';
@@ -35,21 +36,25 @@ export const routes: Routes = [
     path:'',
     component:AppLayoutComponent,
     canActivate: [dasiAuthGuard],
+    canActivateChild: [dasiPermissionGuard],
     children:[
       {
         path: '',
         component: DasiDashboardComponent,
         pathMatch: 'full',
+        data: { modulo: 'dashboard' },
         title: 'Dashboard | DASI V.01',
       },
       {
         path:'calendar',
         component:CalenderComponent,
+        data: { modulo: 'calendar' },
         title:'Calendario | DASI V.01'
       },
       {
         path:'profile',
         component:ProfileComponent,
+        data: { modulo: 'profile' },
         title:'Perfil | DASI V.01'
       },
       {
@@ -113,28 +118,28 @@ export const routes: Routes = [
         component:VideosComponent,
         title:'Angular Videos Dashboard | TailAdmin - Angular Admin Dashboard Template'
       },
-      { path: 'proyectos', component: ListDemoComponent, data: { kind: 'projects' }, title: 'Proyectos | DASI V.01' },
-      { path: 'proyectos/:id', component: ProjectDetailComponent, title: 'Detalle de proyecto | DASI V.01' },
-      { path: 'mis-proyectos', component: ListDemoComponent, data: { kind: 'my-projects' }, title: 'Mis proyectos | DASI V.01' },
-      { path: 'proyectos-oficina', component: ListDemoComponent, data: { kind: 'my-office' }, title: 'Proyectos de mi oficina | DASI V.01' },
-      { path: 'proyectos-colaboracion', component: ListDemoComponent, data: { kind: 'collaborating' }, title: 'Donde colaboro | DASI V.01' },
-      { path: 'tareas', component: ListDemoComponent, data: { kind: 'tasks' }, title: 'Tareas | DASI V.01' },
-      { path: 'kanban', component: KanbanComponent, title: 'Kanban | DASI V.01' },
-{ path: 'workflow', component: WorkflowComponent, title: 'Workflow | DASI V.01' },
-{ path: 'actividades', component: ListDemoComponent, data: { kind: 'activities' }, title: 'Actividades | DASI V.01' },
-      { path: 'observaciones', component: ObservationsComponent, title: 'Observaciones | DASI V.01' },
-      { path: 'evidencias', component: EvidenceComponent, title: 'Evidencias | DASI V.01' },
-      { path: 'reportes', component: InsightsComponent, data: { kind: 'reports' }, title: 'Reportes | DASI V.01' },
-      { path: 'indicadores', component: InsightsComponent, data: { kind: 'indicators' }, title: 'Indicadores | DASI V.01' },
-{ path: 'usuarios', component: AdminDemoComponent, data: { kind: 'users' }, title: 'Usuarios | DASI V.01' },
-      { path: 'administracion', component: AdminDemoComponent, data: { kind: 'admin' }, title: 'Administración | DASI V.01' },
-      { path: 'roles', component: AdminDemoComponent, data: { kind: 'roles' }, title: 'Roles | DASI V.01' },
-      { path: 'permisos', component: AdminDemoComponent, data: { kind: 'permissions' }, title: 'Permisos | DASI V.01' },
-{ path: 'modulos', component: AdminDemoComponent, data: { kind: 'modules' }, title: 'Módulos | DASI V.01' },
-      { path: 'dependencias', component: AdminDemoComponent, data: { kind: 'dependencias' }, title: 'Dependencias | DASI V.01' },
-      { path: 'cargos', component: AdminDemoComponent, data: { kind: 'cargos' }, title: 'Cargos | DASI V.01' },
-      { path: 'configuracion', component: AdminDemoComponent, data: { kind: 'settings' }, title: 'Configuración | DASI V.01' },
-{ path: 'auditoria', component: AuditComponent, title: 'Auditoría | DASI V.01' },
+      { path: 'proyectos', component: ListDemoComponent, data: { kind: 'projects', modulo: 'proyectos' }, title: 'Proyectos | DASI V.01' },
+      { path: 'proyectos/:id', component: ProjectDetailComponent, data: { modulo: 'proyectos' }, title: 'Detalle de proyecto | DASI V.01' },
+      { path: 'mis-proyectos', component: ListDemoComponent, data: { kind: 'my-projects', modulo: 'mis-proyectos' }, title: 'Mis proyectos | DASI V.01' },
+      { path: 'proyectos-oficina', component: ListDemoComponent, data: { kind: 'my-office', modulo: 'proyectos-oficina' }, title: 'Proyectos de mi oficina | DASI V.01' },
+      { path: 'proyectos-colaboracion', component: ListDemoComponent, data: { kind: 'collaborating', modulo: 'proyectos-colaboracion' }, title: 'Donde colaboro | DASI V.01' },
+      { path: 'tareas', component: ListDemoComponent, data: { kind: 'tasks', modulo: 'tareas' }, title: 'Tareas | DASI V.01' },
+      { path: 'kanban', component: KanbanComponent, data: { modulo: 'kanban' }, title: 'Kanban | DASI V.01' },
+{ path: 'workflow', component: WorkflowComponent, data: { modulo: 'workflow' }, title: 'Workflow | DASI V.01' },
+{ path: 'actividades', component: ListDemoComponent, data: { kind: 'activities', modulo: 'actividades' }, title: 'Actividades | DASI V.01' },
+      { path: 'observaciones', component: ObservationsComponent, data: { modulo: 'observaciones' }, title: 'Observaciones | DASI V.01' },
+      { path: 'evidencias', component: EvidenceComponent, data: { modulo: 'evidencias' }, title: 'Evidencias | DASI V.01' },
+      { path: 'reportes', component: InsightsComponent, data: { kind: 'reports', modulo: 'reportes' }, title: 'Reportes | DASI V.01' },
+      { path: 'indicadores', component: InsightsComponent, data: { kind: 'indicators', modulo: 'indicadores' }, title: 'Indicadores | DASI V.01' },
+{ path: 'usuarios', component: AdminDemoComponent, data: { kind: 'users', modulo: 'usuarios' }, title: 'Usuarios | DASI V.01' },
+      { path: 'administracion', component: AdminDemoComponent, data: { kind: 'admin', modulo: 'administracion' }, title: 'Administración | DASI V.01' },
+      { path: 'roles', component: AdminDemoComponent, data: { kind: 'roles', modulo: 'roles' }, title: 'Roles | DASI V.01' },
+      { path: 'permisos', component: AdminDemoComponent, data: { kind: 'permissions', modulo: 'permisos' }, title: 'Permisos | DASI V.01' },
+{ path: 'modulos', component: AdminDemoComponent, data: { kind: 'modules', modulo: 'modulos' }, title: 'Módulos | DASI V.01' },
+      { path: 'dependencias', component: AdminDemoComponent, data: { kind: 'dependencias', modulo: 'dependencias' }, title: 'Dependencias | DASI V.01' },
+      { path: 'cargos', component: AdminDemoComponent, data: { kind: 'cargos', modulo: 'cargos' }, title: 'Cargos | DASI V.01' },
+      { path: 'configuracion', component: AdminDemoComponent, data: { kind: 'settings', modulo: 'configuracion' }, title: 'Configuración | DASI V.01' },
+{ path: 'auditoria', component: AuditComponent, data: { modulo: 'auditoria' }, title: 'Auditoría | DASI V.01' },
       { path: 'ayuda', component: InstitucionalComponent, data: { kind: 'ayuda' }, title: 'Ayuda | DASI V.01' },
       { path: 'acerca', component: InstitucionalComponent, data: { kind: 'acerca' }, title: 'Acerca de DASI | DASI V.01' },
     ]
